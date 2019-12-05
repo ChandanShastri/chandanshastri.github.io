@@ -1,0 +1,1 @@
+sed -e 's/js///prjs/g' *.html
