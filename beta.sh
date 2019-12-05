@@ -1,1 +1,1 @@
-sed -e 's/js///prjs/g' *.html
+sed -i 's/prjs/beta_js/g' *.html
