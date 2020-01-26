@@ -5,12 +5,10 @@ from pyspark import SparkContext
 from pyspark.sql.functions import input_file_name
 
 #sc = SparkContext("local", "test")
-#spark  = SparkSession.builder.master("local").enableHiveSupport().getOrCreate()
-sc = SparkSession.builder.getOrCreate()
-gg = SparkContext(sc)
-sql = SQLContext(gg)
+spark  = SparkSession.builder.master("local").enableHiveSupport().getOrCreate()
+sql = SQLContext(spark)
 
 df = sql.read.parquet("hdfs://localhost:9000/test/database/")
-names = df.select(inputFileName())
+names = df.select(input_file_name())
 names.show()
 #names.repartition(1).write.option("header", "true").csv("filename1.csv")
