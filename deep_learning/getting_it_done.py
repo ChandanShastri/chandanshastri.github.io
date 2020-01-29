@@ -38,5 +38,15 @@ def fib_man(n):
     #print(cache)
     return value
 
-for i in range (100) :
-    print(fib_man(i))
+# for i in range (100) :
+#     print(fib_man(i))
+w=[1,2,3,4,5]
+z=[1,3,4,5,6]
+a=[(i,y) for i in w for y in z]
+b=[i*4 for i in range (2,200)]
+print(a,b)
+
+import timeit
+
+aa=timeit.timeit(stmt="(a,b,c)", number=1000)
+print(aa)
