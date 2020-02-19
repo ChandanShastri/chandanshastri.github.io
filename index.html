@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 
+
+<!-- 
+  
+  Well, well, well,
+  I have intentionally made the source code look as ugly as possible. :-)  
+
+-->
+
 <head>
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <meta charset="utf-8">
@@ -23,12 +31,14 @@
   </title>
 </head>
 
-<body id="bodyplace" oncontextmenu="cleanup()" class="container">
+<body id="bodyplace" oncontextmenu="alert('Come on..! My site is not THAT good..!   :-) ')" class="container">
   <br>
   <br>
   <font color="black">
     <hr><br><center><h4>Chandan Shastri's Profile</h4></center>
-    <br><hr><br>
+    <br><hr>
+    <div id='welcomeback'></div>
+    <br>
     <center>
         <a href="https://linkedin.com/in/chandanshastri" target="_blank"><b>LinkedIn</b></a> |
         <a href="https://github.com/ChandanShastri" target="_blank"><b>GitHub</b></a> |
@@ -52,6 +62,7 @@
     <div class="card-tabs">
       <ul class="tabs tabs-fixed-width">
         <li class="tab"><a class="active" href="#bigdata">Big Data Projects</a></li>
+        <li class="tab"><a href="#cs_kyd">About Your Device</a></li>
         <li class="tab"><a href="#cs_ml">Machine Learning</a></li>
       </ul>
     </div>
@@ -62,18 +73,55 @@
       <br><i>System Requirements : Docker Desktop, Min. 8 GB RAM, Min. 20 GB Disk Space. </i> </span>
       </div>
       <div id="cs_ml"><button type="button" class="waves-effect waves-light btn-small">( Under Construction )</button></div>
-      </center>
+      
+      <div id="cs_kyd"><button type="button" class="waves-effect waves-light btn-small">( Under Construction )</button></div>
+    </center>
     </div>
   </div>
 </div>
+<br><hr>
+<br>
 
+<style>
+li {
+    list-style-type: circle;
+}
 
+li li {
+    list-style-type: square;
+}
+
+</style>
+
+<div class="container">
+  <div class="card z-depth-4">
+    <div class="card-content">
+      <p><center><b><h6>Pseudo Research ( aka cs_pr )</b></center></h6></center>
+          <ol>
+            <li><a href="https://youtu.be/HqDNjKnf98M" target="_blank" >Night Mode on Smartphones and Computational Photography</a></li>
+          </ol>
+      </p>
+</div>
+</div></div>
 
 <br><hr><br>
 <div class="container"><center>
   <img src="imgs/cs_logo.png" class="responsive-img z-depth-4" alt="Chandan Shastri's Logo"></center>
 </div><br><br>
 
+<div id="footer-mobile">
+</div>
+
+<script>
+  if(screen.width < 720) {
+    document.getElementById('footer-mobile').innerHTML="<br><br><footer><center><font aria-setsize='5'> This Site is not designed for mobile viewing. </font></center><br><br></footer>";
+  }
+  console.log(screen.width);
+  console.log(window.screen.orientation)
+</script>
+
 </body>
+
 <!-- Made by Chandan Shastri. crshastri@gmail.com -->
+
 </html>
