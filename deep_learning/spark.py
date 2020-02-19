@@ -1,7 +1,7 @@
 from pyspark.sql import SparkSession
-from pyspark.sql import SQLContext
-from pyspark.conf import SparkConf
-from pyspark import SparkContext
+# from pyspark.sql import SQLContext
+# from pyspark.conf import SparkConf
+# from pyspark import SparkContext
 from pyspark.sql.functions import input_file_name
 
 
@@ -16,3 +16,6 @@ names = df.select(input_file_name())
 names.show()
 d=input("WAIT")
 #names.repartition(1).write.option("header", "true").csv("filename1.csv")
+
+jdbcDF2 = spark.read.jdbc("jdbc:postgresql:dbserver", "schema.tablename",
+          properties={"user": "username", "password": "password"})

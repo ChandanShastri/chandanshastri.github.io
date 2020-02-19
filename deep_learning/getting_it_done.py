@@ -20,7 +20,6 @@ def fib_vanilla(n):
 
 
 
-
 cache={}
 
 def fib_man(n):
