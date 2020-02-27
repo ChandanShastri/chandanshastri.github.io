@@ -1,1 +1,0 @@
-sed -i 's/prjs/beta_js/g' *.html
