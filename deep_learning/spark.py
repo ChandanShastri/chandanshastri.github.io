@@ -8,7 +8,7 @@ from pyspark.sql.functions import input_file_name
 #conf = SparkConf().setAppName('hello').setMaster('spark://SC-PC.localdomain:7077')
 #sc = SparkContext(conf=conf)
 #sc = SparkContext("local", "test")
-spark  = SparkSession.builder.master("local").enableHiveSupport().getOrCreate()
+spark  = SparkSession.builder().master("local").enableHiveSupport().getOrCreate()
 sql = SQLContext(spark)
 
 df = sql.read.parquet("hdfs://localhost:9000/test/database/")
