@@ -35,7 +35,8 @@
   <br>
   <br>
   <font color="black">
-    <hr><br><center><h4>Chandan Shastri's Profile</h4></center>
+    <hr><br><center><h4>The Showcase</h4></center><br>
+    <center><div id="year"></div></center>
     <br><hr>
     <div id='welcomeback'></div>
     <br>
@@ -105,7 +106,7 @@ li li {
 <div class="container">
   <div class="card z-depth-4">
     <div class="card-content">
-      <p><center><b><h6>Pseudo Research ( aka cs_pr )</b></center></h6></center>
+      <p><center><b><h6>Pseudo Research ( aka cs_pr )</b></center></h6>
           <ol>
             <li><a href="https://youtu.be/HqDNjKnf98M" target="_blank" >Night Mode on Smartphones and Computational Photography</a></li>
           </ol>
@@ -114,6 +115,18 @@ li li {
 </div></div>
 
 <br><hr><br>
+<div class="container">
+  <div class="card z-depth-4">
+    <div class="card-content">
+      <p><center><b><h6>Pseudo Writings ( aka cs_pw )</b></center></h6><br>
+        <center>
+          <a href="https://medium.com/@chandanrshastri" target="_blank"><button type="button" class="waves-effect waves-light btn-small">Chandan on Medium</button></a>
+        </center>
+      </p>
+</div>
+</div></div>
+<br><hr><br>
+
 <div class="container"><center>
   <img src="imgs/cs_logo.png" class="responsive-img z-depth-4" alt="Chandan Shastri's Logo"></center>
 </div><br><br>
@@ -126,7 +139,7 @@ li li {
     document.getElementById('footer-mobile').innerHTML="<br><br><footer><center><font aria-setsize='5'> This Site is not designed for mobile viewing. </font></center><br><br></footer>";
   }
 
- 
+  document.getElementById('year').innerHTML="&copy; Chandan Shastri - "+(new Date().getFullYear());
 
   function cs_web () {
   console.log('Chandan Shastri\'s Workspace :  ')
