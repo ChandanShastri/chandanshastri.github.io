@@ -13084,7 +13084,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[97]:</div>
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
@@ -13107,10 +13107,10 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[28]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">spark</span> <span class="o">=</span> <span class="n">SparkSession</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">master</span><span class="p">(</span><span class="s1">&#39;local&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">appName</span><span class="p">(</span><span class="s1">&#39;TT&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">enableHiveSupport</span><span class="p">()</span><span class="o">.</span><span class="n">getOrCreate</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">spark</span> <span class="o">=</span> <span class="n">SparkSession</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">master</span><span class="p">(</span><span class="s1">&#39;local&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">appName</span><span class="p">(</span><span class="s2">&quot;csds_test&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">enableHiveSupport</span><span class="p">()</span><span class="o">.</span><span class="n">getOrCreate</span><span class="p">()</span>
 </pre></div>
 
     </div>
@@ -13120,7 +13120,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[29]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">spark</span>
@@ -13136,7 +13136,7 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[29]:</div>
+    <div class="prompt output_prompt">Out[3]:</div>
 
 
 
@@ -13148,7 +13148,7 @@ div#notebook {
         <div>
             <p><b>SparkContext</b></p>
 
-            <p><a href="http://host.docker.internal:4040">Spark UI</a></p>
+            <p><a href="http://host.docker.internal:4041">Spark UI</a></p>
 
             <dl>
               <dt>Version</dt>
@@ -13156,7 +13156,7 @@ div#notebook {
               <dt>Master</dt>
                 <dd><code>local</code></dd>
               <dt>AppName</dt>
-                <dd><code>TT</code></dd>
+                <dd><code>csds_test</code></dd>
             </dl>
         </div>
         
@@ -13179,7 +13179,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[32]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">isro</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">jdbc</span><span class="p">(</span><span class="s2">&quot;jdbc:mysql://localhost:3306&quot;</span><span class="p">,</span><span class="s2">&quot;rrsc_aws.aws_log&quot;</span><span class="p">,</span><span class="n">properties</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;user&#39;</span><span class="p">:</span><span class="s1">&#39;chandanshastri&#39;</span><span class="p">,</span><span class="s1">&#39;password&#39;</span><span class="p">:</span><span class="s1">&#39;superman&#39;</span><span class="p">})</span>
@@ -13192,7 +13192,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[36]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">isro</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="n">truncate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -13245,7 +13245,7 @@ only showing top 10 rows
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[113]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">isro</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
@@ -13261,7 +13261,7 @@ only showing top 10 rows
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[113]:</div>
+    <div class="prompt output_prompt">Out[6]:</div>
 
 
 
@@ -13278,7 +13278,7 @@ only showing top 10 rows
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[38]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">isro</span><span class="o">.</span><span class="n">printSchema</span><span class="p">()</span>
@@ -13332,7 +13332,7 @@ only showing top 10 rows
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[110]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">test</span> <span class="o">=</span> <span class="n">isro</span><span class="o">.</span><span class="n">filter</span><span class="p">((</span><span class="n">isro</span><span class="o">.</span><span class="n">RAINt</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;RTIME&#39;</span><span class="p">,</span><span class="s1">&#39;AirTemp&#39;</span><span class="p">,</span><span class="s1">&#39;RelHum&#39;</span><span class="p">,</span><span class="s1">&#39;RAINt&#39;</span><span class="p">)</span>
@@ -13345,7 +13345,7 @@ only showing top 10 rows
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[111]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">test</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="n">truncate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -13398,7 +13398,7 @@ only showing top 10 rows
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[112]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">t</span><span class="o">=</span><span class="n">time</span><span class="p">()</span>
@@ -13426,7 +13426,7 @@ only showing top 10 rows
 |   23.502284|
 +------------+
 
-Total time taken : 0.13900232315063477 ms
+Total time taken : 0.4559957981109619 ms
 </pre>
 </div>
 </div>
@@ -13444,7 +13444,7 @@ Total time taken : 0.13900232315063477 ms
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[108]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -13457,7 +13457,7 @@ Total time taken : 0.13900232315063477 ms
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[99]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">rtime</span> <span class="o">=</span> <span class="n">test</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;RTIME&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
@@ -13470,7 +13470,7 @@ Total time taken : 0.13900232315063477 ms
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[100]:</div>
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">temp</span> <span class="o">=</span> <span class="n">test</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;AirTemp&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
@@ -13483,7 +13483,7 @@ Total time taken : 0.13900232315063477 ms
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[102]:</div>
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rtime</span><span class="p">,</span><span class="n">temp</span><span class="p">)</span>
@@ -13499,13 +13499,13 @@ Total time taken : 0.13900232315063477 ms
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[102]:</div>
+    <div class="prompt output_prompt">Out[14]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[&lt;matplotlib.lines.Line2D at 0x1559e992bc8&gt;]</pre>
+<pre>[&lt;matplotlib.lines.Line2D at 0x1e6df6acec8&gt;]</pre>
 </div>
 
 </div>
@@ -13516,13 +13516,1171 @@ Total time taken : 0.13900232315063477 ms
 
 
 
+<div class="output_svg output_subarea ">
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Created with matplotlib (https://matplotlib.org/) -->
+<svg height="248.518125pt" version="1.1" viewBox="0 0 368.925 248.518125" width="368.925pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+*{stroke-linecap:butt;stroke-linejoin:round;}
+  </style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M -0 248.518125 
+L 368.925 248.518125 
+L 368.925 0 
+L -0 0 
+z
+" style="fill:none;"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 26.925 224.64 
+L 361.725 224.64 
+L 361.725 7.2 
+L 26.925 7.2 
+z
+" style="fill:#ffffff;"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <defs>
+       <path d="M 0 0 
+L 0 3.5 
+" id="m9d0146186c" style="stroke:#000000;stroke-width:0.8;"/>
+      </defs>
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="37.313321" xlink:href="#m9d0146186c" y="224.64"/>
+      </g>
+     </g>
+     <g id="text_1">
+      <!-- 2017-04 -->
+      <defs>
+       <path d="M 19.1875 8.296875 
+L 53.609375 8.296875 
+L 53.609375 0 
+L 7.328125 0 
+L 7.328125 8.296875 
+Q 12.9375 14.109375 22.625 23.890625 
+Q 32.328125 33.6875 34.8125 36.53125 
+Q 39.546875 41.84375 41.421875 45.53125 
+Q 43.3125 49.21875 43.3125 52.78125 
+Q 43.3125 58.59375 39.234375 62.25 
+Q 35.15625 65.921875 28.609375 65.921875 
+Q 23.96875 65.921875 18.8125 64.3125 
+Q 13.671875 62.703125 7.8125 59.421875 
+L 7.8125 69.390625 
+Q 13.765625 71.78125 18.9375 73 
+Q 24.125 74.21875 28.421875 74.21875 
+Q 39.75 74.21875 46.484375 68.546875 
+Q 53.21875 62.890625 53.21875 53.421875 
+Q 53.21875 48.921875 51.53125 44.890625 
+Q 49.859375 40.875 45.40625 35.40625 
+Q 44.1875 33.984375 37.640625 27.21875 
+Q 31.109375 20.453125 19.1875 8.296875 
+z
+" id="DejaVuSans-50"/>
+       <path d="M 31.78125 66.40625 
+Q 24.171875 66.40625 20.328125 58.90625 
+Q 16.5 51.421875 16.5 36.375 
+Q 16.5 21.390625 20.328125 13.890625 
+Q 24.171875 6.390625 31.78125 6.390625 
+Q 39.453125 6.390625 43.28125 13.890625 
+Q 47.125 21.390625 47.125 36.375 
+Q 47.125 51.421875 43.28125 58.90625 
+Q 39.453125 66.40625 31.78125 66.40625 
+z
+M 31.78125 74.21875 
+Q 44.046875 74.21875 50.515625 64.515625 
+Q 56.984375 54.828125 56.984375 36.375 
+Q 56.984375 17.96875 50.515625 8.265625 
+Q 44.046875 -1.421875 31.78125 -1.421875 
+Q 19.53125 -1.421875 13.0625 8.265625 
+Q 6.59375 17.96875 6.59375 36.375 
+Q 6.59375 54.828125 13.0625 64.515625 
+Q 19.53125 74.21875 31.78125 74.21875 
+z
+" id="DejaVuSans-48"/>
+       <path d="M 12.40625 8.296875 
+L 28.515625 8.296875 
+L 28.515625 63.921875 
+L 10.984375 60.40625 
+L 10.984375 69.390625 
+L 28.421875 72.90625 
+L 38.28125 72.90625 
+L 38.28125 8.296875 
+L 54.390625 8.296875 
+L 54.390625 0 
+L 12.40625 0 
+z
+" id="DejaVuSans-49"/>
+       <path d="M 8.203125 72.90625 
+L 55.078125 72.90625 
+L 55.078125 68.703125 
+L 28.609375 0 
+L 18.3125 0 
+L 43.21875 64.59375 
+L 8.203125 64.59375 
+z
+" id="DejaVuSans-55"/>
+       <path d="M 4.890625 31.390625 
+L 31.203125 31.390625 
+L 31.203125 23.390625 
+L 4.890625 23.390625 
+z
+" id="DejaVuSans-45"/>
+       <path d="M 37.796875 64.3125 
+L 12.890625 25.390625 
+L 37.796875 25.390625 
+z
+M 35.203125 72.90625 
+L 47.609375 72.90625 
+L 47.609375 25.390625 
+L 58.015625 25.390625 
+L 58.015625 17.1875 
+L 47.609375 17.1875 
+L 47.609375 0 
+L 37.796875 0 
+L 37.796875 17.1875 
+L 4.890625 17.1875 
+L 4.890625 26.703125 
+z
+" id="DejaVuSans-52"/>
+      </defs>
+      <g transform="translate(16.421914 239.238437)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-48"/>
+       <use x="127.246094" xlink:href="#DejaVuSans-49"/>
+       <use x="190.869141" xlink:href="#DejaVuSans-55"/>
+       <use x="254.492188" xlink:href="#DejaVuSans-45"/>
+       <use x="290.576172" xlink:href="#DejaVuSans-48"/>
+       <use x="354.199219" xlink:href="#DejaVuSans-52"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_2">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="66.972169" xlink:href="#m9d0146186c" y="224.64"/>
+      </g>
+     </g>
+     <g id="text_2">
+      <!-- 2017-05 -->
+      <defs>
+       <path d="M 10.796875 72.90625 
+L 49.515625 72.90625 
+L 49.515625 64.59375 
+L 19.828125 64.59375 
+L 19.828125 46.734375 
+Q 21.96875 47.46875 24.109375 47.828125 
+Q 26.265625 48.1875 28.421875 48.1875 
+Q 40.625 48.1875 47.75 41.5 
+Q 54.890625 34.8125 54.890625 23.390625 
+Q 54.890625 11.625 47.5625 5.09375 
+Q 40.234375 -1.421875 26.90625 -1.421875 
+Q 22.3125 -1.421875 17.546875 -0.640625 
+Q 12.796875 0.140625 7.71875 1.703125 
+L 7.71875 11.625 
+Q 12.109375 9.234375 16.796875 8.0625 
+Q 21.484375 6.890625 26.703125 6.890625 
+Q 35.15625 6.890625 40.078125 11.328125 
+Q 45.015625 15.765625 45.015625 23.390625 
+Q 45.015625 31 40.078125 35.4375 
+Q 35.15625 39.890625 26.703125 39.890625 
+Q 22.75 39.890625 18.8125 39.015625 
+Q 14.890625 38.140625 10.796875 36.28125 
+z
+" id="DejaVuSans-53"/>
+      </defs>
+      <g transform="translate(46.080763 239.238437)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-48"/>
+       <use x="127.246094" xlink:href="#DejaVuSans-49"/>
+       <use x="190.869141" xlink:href="#DejaVuSans-55"/>
+       <use x="254.492188" xlink:href="#DejaVuSans-45"/>
+       <use x="290.576172" xlink:href="#DejaVuSans-48"/>
+       <use x="354.199219" xlink:href="#DejaVuSans-53"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_3">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="97.619646" xlink:href="#m9d0146186c" y="224.64"/>
+      </g>
+     </g>
+     <g id="text_3">
+      <!-- 2017-06 -->
+      <defs>
+       <path d="M 33.015625 40.375 
+Q 26.375 40.375 22.484375 35.828125 
+Q 18.609375 31.296875 18.609375 23.390625 
+Q 18.609375 15.53125 22.484375 10.953125 
+Q 26.375 6.390625 33.015625 6.390625 
+Q 39.65625 6.390625 43.53125 10.953125 
+Q 47.40625 15.53125 47.40625 23.390625 
+Q 47.40625 31.296875 43.53125 35.828125 
+Q 39.65625 40.375 33.015625 40.375 
+z
+M 52.59375 71.296875 
+L 52.59375 62.3125 
+Q 48.875 64.0625 45.09375 64.984375 
+Q 41.3125 65.921875 37.59375 65.921875 
+Q 27.828125 65.921875 22.671875 59.328125 
+Q 17.53125 52.734375 16.796875 39.40625 
+Q 19.671875 43.65625 24.015625 45.921875 
+Q 28.375 48.1875 33.59375 48.1875 
+Q 44.578125 48.1875 50.953125 41.515625 
+Q 57.328125 34.859375 57.328125 23.390625 
+Q 57.328125 12.15625 50.6875 5.359375 
+Q 44.046875 -1.421875 33.015625 -1.421875 
+Q 20.359375 -1.421875 13.671875 8.265625 
+Q 6.984375 17.96875 6.984375 36.375 
+Q 6.984375 53.65625 15.1875 63.9375 
+Q 23.390625 74.21875 37.203125 74.21875 
+Q 40.921875 74.21875 44.703125 73.484375 
+Q 48.484375 72.75 52.59375 71.296875 
+z
+" id="DejaVuSans-54"/>
+      </defs>
+      <g transform="translate(76.72824 239.238437)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-48"/>
+       <use x="127.246094" xlink:href="#DejaVuSans-49"/>
+       <use x="190.869141" xlink:href="#DejaVuSans-55"/>
+       <use x="254.492188" xlink:href="#DejaVuSans-45"/>
+       <use x="290.576172" xlink:href="#DejaVuSans-48"/>
+       <use x="354.199219" xlink:href="#DejaVuSans-54"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_4">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="127.278495" xlink:href="#m9d0146186c" y="224.64"/>
+      </g>
+     </g>
+     <g id="text_4">
+      <!-- 2017-07 -->
+      <g transform="translate(106.387089 239.238437)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-48"/>
+       <use x="127.246094" xlink:href="#DejaVuSans-49"/>
+       <use x="190.869141" xlink:href="#DejaVuSans-55"/>
+       <use x="254.492188" xlink:href="#DejaVuSans-45"/>
+       <use x="290.576172" xlink:href="#DejaVuSans-48"/>
+       <use x="354.199219" xlink:href="#DejaVuSans-55"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_5">
+     <g id="line2d_5">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="157.925972" xlink:href="#m9d0146186c" y="224.64"/>
+      </g>
+     </g>
+     <g id="text_5">
+      <!-- 2017-08 -->
+      <defs>
+       <path d="M 31.78125 34.625 
+Q 24.75 34.625 20.71875 30.859375 
+Q 16.703125 27.09375 16.703125 20.515625 
+Q 16.703125 13.921875 20.71875 10.15625 
+Q 24.75 6.390625 31.78125 6.390625 
+Q 38.8125 6.390625 42.859375 10.171875 
+Q 46.921875 13.96875 46.921875 20.515625 
+Q 46.921875 27.09375 42.890625 30.859375 
+Q 38.875 34.625 31.78125 34.625 
+z
+M 21.921875 38.8125 
+Q 15.578125 40.375 12.03125 44.71875 
+Q 8.5 49.078125 8.5 55.328125 
+Q 8.5 64.0625 14.71875 69.140625 
+Q 20.953125 74.21875 31.78125 74.21875 
+Q 42.671875 74.21875 48.875 69.140625 
+Q 55.078125 64.0625 55.078125 55.328125 
+Q 55.078125 49.078125 51.53125 44.71875 
+Q 48 40.375 41.703125 38.8125 
+Q 48.828125 37.15625 52.796875 32.3125 
+Q 56.78125 27.484375 56.78125 20.515625 
+Q 56.78125 9.90625 50.3125 4.234375 
+Q 43.84375 -1.421875 31.78125 -1.421875 
+Q 19.734375 -1.421875 13.25 4.234375 
+Q 6.78125 9.90625 6.78125 20.515625 
+Q 6.78125 27.484375 10.78125 32.3125 
+Q 14.796875 37.15625 21.921875 38.8125 
+z
+M 18.3125 54.390625 
+Q 18.3125 48.734375 21.84375 45.5625 
+Q 25.390625 42.390625 31.78125 42.390625 
+Q 38.140625 42.390625 41.71875 45.5625 
+Q 45.3125 48.734375 45.3125 54.390625 
+Q 45.3125 60.0625 41.71875 63.234375 
+Q 38.140625 66.40625 31.78125 66.40625 
+Q 25.390625 66.40625 21.84375 63.234375 
+Q 18.3125 60.0625 18.3125 54.390625 
+z
+" id="DejaVuSans-56"/>
+      </defs>
+      <g transform="translate(137.034566 239.238437)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-48"/>
+       <use x="127.246094" xlink:href="#DejaVuSans-49"/>
+       <use x="190.869141" xlink:href="#DejaVuSans-55"/>
+       <use x="254.492188" xlink:href="#DejaVuSans-45"/>
+       <use x="290.576172" xlink:href="#DejaVuSans-48"/>
+       <use x="354.199219" xlink:href="#DejaVuSans-56"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_6">
+     <g id="line2d_6">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="188.573449" xlink:href="#m9d0146186c" y="224.64"/>
+      </g>
+     </g>
+     <g id="text_6">
+      <!-- 2017-09 -->
+      <defs>
+       <path d="M 10.984375 1.515625 
+L 10.984375 10.5 
+Q 14.703125 8.734375 18.5 7.8125 
+Q 22.3125 6.890625 25.984375 6.890625 
+Q 35.75 6.890625 40.890625 13.453125 
+Q 46.046875 20.015625 46.78125 33.40625 
+Q 43.953125 29.203125 39.59375 26.953125 
+Q 35.25 24.703125 29.984375 24.703125 
+Q 19.046875 24.703125 12.671875 31.3125 
+Q 6.296875 37.9375 6.296875 49.421875 
+Q 6.296875 60.640625 12.9375 67.421875 
+Q 19.578125 74.21875 30.609375 74.21875 
+Q 43.265625 74.21875 49.921875 64.515625 
+Q 56.59375 54.828125 56.59375 36.375 
+Q 56.59375 19.140625 48.40625 8.859375 
+Q 40.234375 -1.421875 26.421875 -1.421875 
+Q 22.703125 -1.421875 18.890625 -0.6875 
+Q 15.09375 0.046875 10.984375 1.515625 
+z
+M 30.609375 32.421875 
+Q 37.25 32.421875 41.125 36.953125 
+Q 45.015625 41.5 45.015625 49.421875 
+Q 45.015625 57.28125 41.125 61.84375 
+Q 37.25 66.40625 30.609375 66.40625 
+Q 23.96875 66.40625 20.09375 61.84375 
+Q 16.21875 57.28125 16.21875 49.421875 
+Q 16.21875 41.5 20.09375 36.953125 
+Q 23.96875 32.421875 30.609375 32.421875 
+z
+" id="DejaVuSans-57"/>
+      </defs>
+      <g transform="translate(167.682043 239.238437)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-48"/>
+       <use x="127.246094" xlink:href="#DejaVuSans-49"/>
+       <use x="190.869141" xlink:href="#DejaVuSans-55"/>
+       <use x="254.492188" xlink:href="#DejaVuSans-45"/>
+       <use x="290.576172" xlink:href="#DejaVuSans-48"/>
+       <use x="354.199219" xlink:href="#DejaVuSans-57"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_7">
+     <g id="line2d_7">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="218.232298" xlink:href="#m9d0146186c" y="224.64"/>
+      </g>
+     </g>
+     <g id="text_7">
+      <!-- 2017-10 -->
+      <g transform="translate(197.340891 239.238437)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-48"/>
+       <use x="127.246094" xlink:href="#DejaVuSans-49"/>
+       <use x="190.869141" xlink:href="#DejaVuSans-55"/>
+       <use x="254.492188" xlink:href="#DejaVuSans-45"/>
+       <use x="290.576172" xlink:href="#DejaVuSans-49"/>
+       <use x="354.199219" xlink:href="#DejaVuSans-48"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_8">
+     <g id="line2d_8">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="248.879775" xlink:href="#m9d0146186c" y="224.64"/>
+      </g>
+     </g>
+     <g id="text_8">
+      <!-- 2017-11 -->
+      <g transform="translate(227.988368 239.238437)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-48"/>
+       <use x="127.246094" xlink:href="#DejaVuSans-49"/>
+       <use x="190.869141" xlink:href="#DejaVuSans-55"/>
+       <use x="254.492188" xlink:href="#DejaVuSans-45"/>
+       <use x="290.576172" xlink:href="#DejaVuSans-49"/>
+       <use x="354.199219" xlink:href="#DejaVuSans-49"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_9">
+     <g id="line2d_9">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="278.538623" xlink:href="#m9d0146186c" y="224.64"/>
+      </g>
+     </g>
+     <g id="text_9">
+      <!-- 2017-12 -->
+      <g transform="translate(257.647217 239.238437)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-48"/>
+       <use x="127.246094" xlink:href="#DejaVuSans-49"/>
+       <use x="190.869141" xlink:href="#DejaVuSans-55"/>
+       <use x="254.492188" xlink:href="#DejaVuSans-45"/>
+       <use x="290.576172" xlink:href="#DejaVuSans-49"/>
+       <use x="354.199219" xlink:href="#DejaVuSans-50"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_10">
+     <g id="line2d_10">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="309.1861" xlink:href="#m9d0146186c" y="224.64"/>
+      </g>
+     </g>
+     <g id="text_10">
+      <!-- 2018-01 -->
+      <g transform="translate(288.294694 239.238437)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-48"/>
+       <use x="127.246094" xlink:href="#DejaVuSans-49"/>
+       <use x="190.869141" xlink:href="#DejaVuSans-56"/>
+       <use x="254.492188" xlink:href="#DejaVuSans-45"/>
+       <use x="290.576172" xlink:href="#DejaVuSans-48"/>
+       <use x="354.199219" xlink:href="#DejaVuSans-49"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_11">
+     <g id="line2d_11">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="339.833577" xlink:href="#m9d0146186c" y="224.64"/>
+      </g>
+     </g>
+     <g id="text_11">
+      <!-- 2018-02 -->
+      <g transform="translate(318.942171 239.238437)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-48"/>
+       <use x="127.246094" xlink:href="#DejaVuSans-49"/>
+       <use x="190.869141" xlink:href="#DejaVuSans-56"/>
+       <use x="254.492188" xlink:href="#DejaVuSans-45"/>
+       <use x="290.576172" xlink:href="#DejaVuSans-48"/>
+       <use x="354.199219" xlink:href="#DejaVuSans-50"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_12">
+      <defs>
+       <path d="M 0 0 
+L -3.5 0 
+" id="m2dd46500b9" style="stroke:#000000;stroke-width:0.8;"/>
+      </defs>
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="26.925" xlink:href="#m2dd46500b9" y="194.367723"/>
+      </g>
+     </g>
+     <g id="text_12">
+      <!-- 20 -->
+      <g transform="translate(7.2 198.166942)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-48"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_13">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="26.925" xlink:href="#m2dd46500b9" y="155.532216"/>
+      </g>
+     </g>
+     <g id="text_13">
+      <!-- 22 -->
+      <g transform="translate(7.2 159.331435)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-50"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_14">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="26.925" xlink:href="#m2dd46500b9" y="116.69671"/>
+      </g>
+     </g>
+     <g id="text_14">
+      <!-- 24 -->
+      <g transform="translate(7.2 120.495929)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-52"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_15">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="26.925" xlink:href="#m2dd46500b9" y="77.861204"/>
+      </g>
+     </g>
+     <g id="text_15">
+      <!-- 26 -->
+      <g transform="translate(7.2 81.660423)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-54"/>
+      </g>
+     </g>
+    </g>
+    <g id="ytick_5">
+     <g id="line2d_16">
+      <g>
+       <use style="stroke:#000000;stroke-width:0.8;" x="26.925" xlink:href="#m2dd46500b9" y="39.025697"/>
+      </g>
+     </g>
+     <g id="text_16">
+      <!-- 28 -->
+      <g transform="translate(7.2 42.824916)scale(0.1 -0.1)">
+       <use xlink:href="#DejaVuSans-50"/>
+       <use x="63.623047" xlink:href="#DejaVuSans-56"/>
+      </g>
+     </g>
+    </g>
+   </g>
+   <g id="line2d_17">
+    <path clip-path="url(#p91f0419d63)" d="M 42.143182 156.503104 
+L 43.111214 128.735717 
+L 43.13181 100.774153 
+L 43.142108 147.959293 
+L 53.800757 115.531645 
+L 75.66386 89.123501 
+L 75.674158 142.133967 
+L 76.683383 139.027126 
+L 77.455749 78.832091 
+L 80.473124 17.083636 
+L 80.493721 144.464097 
+L 83.449308 45.627734 
+L 83.696465 184.853024 
+L 83.706763 174.17326 
+L 84.664496 181.940361 
+L 84.685093 191.260882 
+L 84.715988 188.930752 
+L 86.610858 139.221304 
+L 86.724139 185.047201 
+L 86.734437 185.629734 
+L 88.660202 193.202658 
+L 92.604417 153.590441 
+L 92.7074 182.522893 
+L 92.717698 181.940361 
+L 92.738294 183.493781 
+L 93.469467 150.483601 
+L 93.500362 192.425947 
+L 106.187758 129.124072 
+L 106.198056 143.104854 
+L 113.066963 128.735717 
+L 113.077262 156.697282 
+L 113.08756 153.784619 
+L 130.089907 170.289709 
+L 130.100205 172.231484 
+L 131.953883 99.41491 
+L 131.964181 178.250988 
+L 131.974479 176.697567 
+L 133.004301 162.522608 
+L 137.95774 123.687101 
+L 167.812255 170.483886 
+L 168.636112 153.784619 
+L 168.64641 163.687673 
+L 171.807961 135.726108 
+L 171.972732 214.756364 
+L 171.993329 214.368009 
+L 174.609074 143.881565 
+L 174.619373 173.396549 
+L 175.535913 154.755506 
+L 176.390665 173.590727 
+L 176.400963 205.241665 
+L 180.479055 125.046344 
+L 180.551142 189.90164 
+L 180.561441 188.348219 
+L 223.752139 27.569223 
+L 223.896314 160.580832 
+L 223.999296 178.445165 
+L 227.02697 147.37676 
+L 227.037268 166.988691 
+L 227.057865 164.076028 
+L 227.974406 150.677778 
+L 227.984704 159.027412 
+L 228.262755 198.639629 
+L 228.829157 136.696996 
+L 228.911543 172.425662 
+L 229.086612 166.988691 
+L 230.02375 154.561329 
+L 230.13703 183.687959 
+L 231.00208 152.231198 
+L 231.094764 169.901354 
+L 231.599376 147.37676 
+L 231.609674 165.241093 
+L 232.021603 177.085922 
+L 232.103988 191.45506 
+L 232.124585 189.513285 
+L 252.844586 192.037592 
+L 252.854884 195.33861 
+L 253.987687 196.697853 
+L 254.008284 200.581404 
+L 278.38415 188.348219 
+L 278.651904 201.358114 
+L 279.032937 185.435556 
+L 332.583636 87.764258 
+L 346.506818 141.939789 
+L 346.506818 141.939789 
+" style="fill:none;stroke:#1f77b4;stroke-linecap:square;stroke-width:1.5;"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 26.925 224.64 
+L 26.925 7.2 
+" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 361.725 224.64 
+L 361.725 7.2 
+" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 26.925 224.64 
+L 361.725 224.64 
+" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 26.925 7.2 
+L 361.725 7.2 
+" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;"/>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p91f0419d63">
+   <rect height="217.44" width="334.8" x="26.925" y="7.2"/>
+  </clipPath>
+ </defs>
+</svg>
 
-<div class="output_png output_subarea ">
-<img src="data:image/png;base64,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
-"
->
 </div>
 
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">isro</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">csv</span><span class="p">(</span><span class="s1">&#39;isro.csv&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df3</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">csv</span><span class="p">(</span><span class="s1">&#39;isro.csv&#39;</span><span class="p">,</span><span class="n">inferSchema</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df3</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[17]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>29825</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df3</span><span class="o">.</span><span class="n">printSchema</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>root
+ |-- _c0: timestamp (nullable = true)
+ |-- _c1: integer (nullable = true)
+ |-- _c2: double (nullable = true)
+ |-- _c3: double (nullable = true)
+ |-- _c4: double (nullable = true)
+ |-- _c5: double (nullable = true)
+ |-- _c6: double (nullable = true)
+ |-- _c7: double (nullable = true)
+ |-- _c8: double (nullable = true)
+ |-- _c9: double (nullable = true)
+ |-- _c10: double (nullable = true)
+ |-- _c11: double (nullable = true)
+ |-- _c12: double (nullable = true)
+ |-- _c13: double (nullable = true)
+ |-- _c14: double (nullable = true)
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[19]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;create database chandan&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[19]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>DataFrame[]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[20]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># test.write.jdbc(&quot;jdbc:mysql://localhost:3306&quot;,&quot;rrsc_aws.aws_test&quot;,properties={&#39;user&#39;:&#39;chandanshastri&#39;,&#39;password&#39;:&#39;superman&#39;})</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">test</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">mode</span><span class="p">(</span><span class="s2">&quot;append&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">saveAsTable</span><span class="p">(</span><span class="s2">&quot;chandan.test&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;use chandan&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>++
+||
+++
+++
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;show tables&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+--------+---------+-----------+
+|database|tableName|isTemporary|
++--------+---------+-----------+
+| chandan|     test|      false|
++--------+---------+-----------+
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;select * from test&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+-------------------+-------+------+-----+
+|              RTIME|AirTemp|RelHum|RAINt|
++-------------------+-------+------+-----+
+|2017-04-05 21:15:00|  21.95| 81.30|8.890|
+|2017-04-06 20:45:00|  23.38| 81.20|1.016|
+|2017-04-06 21:15:00|  24.82| 78.76|1.524|
+|2017-04-06 21:30:00|  22.39| 91.50|1.270|
+|2017-04-17 16:15:00|  24.06| 66.82|7.112|
+|2017-05-09 19:00:00|  25.42| 73.37|1.270|
+|2017-05-09 19:15:00|  22.69| 90.90|1.778|
+|2017-05-10 19:45:00|  22.85| 85.80|1.524|
+|2017-05-11 14:30:00|  25.95| 80.70|2.540|
+|2017-05-14 15:45:00|  29.13| 73.50|1.016|
+|2017-05-14 16:00:00|  23.52| 83.10|4.572|
+|2017-05-14 16:15:00|  22.57| 78.99|1.524|
+|2017-05-17 16:00:00|  27.66| 75.14|1.270|
+|2017-05-17 21:45:00|  22.68| 89.10|4.064|
+|2017-05-17 22:00:00|  20.49| 94.20|2.032|
+|2017-05-17 22:15:00|  21.04| 94.20|2.286|
+|2017-05-18 21:30:00|  20.64| 94.40|1.270|
+|2017-05-18 21:45:00|  20.43| 94.60|1.270|
+|2017-05-18 22:00:00|  20.16| 95.70|1.778|
+|2017-05-18 22:15:00|  20.25| 96.00|1.778|
++-------------------+-------+------+-----+
+only showing top 20 rows
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[31]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df3</span><span class="o">.</span><span class="n">createTempView</span><span class="p">(</span><span class="s2">&quot;test4view&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[33]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;show tables&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+--------+---------+-----------+
+|database|tableName|isTemporary|
++--------+---------+-----------+
+| chandan|     test|      false|
+|        |test4view|       true|
++--------+---------+-----------+
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[34]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;CREATE TABLE chandan.test4 LIKE chandan.test location &#39;F:/HDFS/&#39;&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[34]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>DataFrame[]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[35]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;show tables&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+--------+---------+-----------+
+|database|tableName|isTemporary|
++--------+---------+-----------+
+| chandan|     test|      false|
+| chandan|    test4|      false|
+|        |test4view|       true|
++--------+---------+-----------+
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[38]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;insert into chandan.test4 select * from test&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[38]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>DataFrame[]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[39]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;select * from chandan.test4&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+-------------------+-------+------+-----+
+|              RTIME|AirTemp|RelHum|RAINt|
++-------------------+-------+------+-----+
+|2017-04-05 21:15:00|  21.95| 81.30|8.890|
+|2017-04-06 20:45:00|  23.38| 81.20|1.016|
+|2017-04-06 21:15:00|  24.82| 78.76|1.524|
+|2017-04-06 21:30:00|  22.39| 91.50|1.270|
+|2017-04-17 16:15:00|  24.06| 66.82|7.112|
+|2017-05-09 19:00:00|  25.42| 73.37|1.270|
+|2017-05-09 19:15:00|  22.69| 90.90|1.778|
+|2017-05-10 19:45:00|  22.85| 85.80|1.524|
+|2017-05-11 14:30:00|  25.95| 80.70|2.540|
+|2017-05-14 15:45:00|  29.13| 73.50|1.016|
+|2017-05-14 16:00:00|  23.52| 83.10|4.572|
+|2017-05-14 16:15:00|  22.57| 78.99|1.524|
+|2017-05-17 16:00:00|  27.66| 75.14|1.270|
+|2017-05-17 21:45:00|  22.68| 89.10|4.064|
+|2017-05-17 22:00:00|  20.49| 94.20|2.032|
+|2017-05-17 22:15:00|  21.04| 94.20|2.286|
+|2017-05-18 21:30:00|  20.64| 94.40|1.270|
+|2017-05-18 21:45:00|  20.43| 94.60|1.270|
+|2017-05-18 22:00:00|  20.16| 95.70|1.778|
+|2017-05-18 22:15:00|  20.25| 96.00|1.778|
++-------------------+-------+------+-----+
+only showing top 20 rows
+
+</pre>
+</div>
 </div>
 
 </div>
