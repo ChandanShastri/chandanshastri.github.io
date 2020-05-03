@@ -51,6 +51,17 @@
       margin-left: -60px;
     }
     
+    
+.responsive-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+}
+
     .tooltip .tooltiptext::after {
       content: "";
       position: absolute;
@@ -102,16 +113,30 @@
     </div>
     <div class="card-tabs">
       <ul class="tabs tabs-fixed-width">
-        <li class="tab"><a class="active" href="#bigdata">Big Data Projects</a></li>
-        <li class="tab"><a href="#cs_kyd">Your Device</a></li>
-        <li class="tab"><a href="#cs_ml">Machine Learning</a></li>
-        <li class="tab"><a href="#cs_apps">Desktop Apps</a></li>
+        <li class="tab"><a class="active" href="#cs_techtalks">Tech Talks</a></li>
+        <li class="tab"><a href="#bigdata">Big Data</a></li>
+        <!-- <li class="tab"><a href="#cs_kyd">Your Device</a></li> -->
+        <li class="tab"><a href="#cs_apps">Apps &amp; more</a></li>
+        <li class="tab"><a href="#cs_ml">ML &amp; AI</a></li>
+        <li class="tab"><a href="#cs_films">FILMS</a></li>
       </ul>
     </div>
     <div class="card-content grey lighten-4">
       <center>
-      <div id="bigdata" class="active"><a href="https://hub.docker.com/u/chandanshastri" target="_blank"><button type="button" class="waves-effect waves-light btn-small">Chandan on Docker Hub</button></a>
-       <br><br> <span>Checkout My Custom DataScience Workspace ( aka cs_ds ),<br>Specially crafted for plug and play development on Hadoop and Spark.<br>
+
+        <div id="cs_techtalks">
+          
+       <br>
+          <iframe width='250px' src="https://www.youtube.com/embed/HqDNjKnf98M" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <br>
+       
+        </div>
+
+
+
+
+      <div id="bigdata">
+     <span>Checkout My Custom DataScience Workspace ( aka cs_ds ),<br>Specially crafted for plug and play development on Hadoop and Spark.<br>
       <br><i>System Requirements : Docker Desktop, Min. 8 GB RAM, Min. 6 GB Disk Space. </i> 
     <br><br><a target="_blank" href='https://medium.com/@chandanrshastri/custom-data-science-workspace-using-docker-6629f5218ccd'><b>Read the Backstory</b></a><br>
     <br>
@@ -127,12 +152,26 @@
     
     </span>
       </div>
-      <div id="cs_ml"><button type="button" class="waves-effect waves-light btn-small">( Under Construction )</button></div>
-      <div id="cs_apps"><button type="button" class="waves-effect waves-light btn-small">( Under Construction )</button></div>
-      <div id="cs_kyd">
+      <div id="cs_ml"><button type="button" class="waves-effect waves-light btn-small disabled">( Under Construction )</button></div>
+      <div id="cs_films"><button type="button" class="waves-effect waves-light btn-small disabled">( Under Construction )</button></div>
+
+
+
+      <div id="cs_apps">
+
+        <a href="https://hub.docker.com/u/chandanshastri" target="_blank"><button type="button" class="waves-effect waves-light btn-small">Chandan on Docker Hub</button></a>
+
+
+      </div>  
+
+
+
+      <!-- <div id="cs_kyd">
       <b>Battery : </b><span id="dtype"></span><br>
       <b>Platform : </b><span id="btype"></span>
-      </div>
+      </div> -->
+
+
     </center>
     </div>
   </div>
@@ -177,8 +216,8 @@ li li {
 <br><hr><br>
 
 <div class="container"><center>
-  <img src="imgs/cs_logo.png" class="responsive-img z-depth-4" alt="Chandan Shastri's Logo"></center>
-</div><br><br>
+  <img width='150px' src="imgs/cs_logo.png" class="responsive-img z-depth-4" alt="Chandan Shastri's Logo"></center>
+</div><br>
 
 <div id="footer-mobile">
 </div>
@@ -197,11 +236,11 @@ li li {
   console.log(navigator.platform)
   }
 
-  navigator.getBattery().then(function(battery) {
-  document.getElementById('dtype').innerHTML=battery.level*100 +" %";
-  });
+  // navigator.getBattery().then(function(battery) {
+  // document.getElementById('dtype').innerHTML=battery.level*100 +" %";
+  // });
 
-  document.getElementById('btype').innerHTML=navigator.platform;
+  // document.getElementById('btype').innerHTML=navigator.platform;
 
 </script>
 
