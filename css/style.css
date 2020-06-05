@@ -55,6 +55,7 @@ height: 100%;
 
 li {
   list-style-type: circle;
+  padding-bottom: 10px;
 }
 
 li li {
