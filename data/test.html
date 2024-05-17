@@ -7,15 +7,41 @@
         body, html {
             height: 100%;
             margin: 0;
+            overflow: hidden;
         }
         .sunset {
             height: 100%;
             background: linear-gradient(to top, #FF4500, #FF6347, #FFD700, #87CEEB);
+            position: relative;
+        }
+        .sun {
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, #FFD700 0%, #FFA500 100%);
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 100%;
+            animation: sunset 10s infinite;
+        }
+        @keyframes sunset {
+            0% {
+                bottom: 100%;
+            }
+            50% {
+                bottom: 10%;
+            }
+            100% {
+                bottom: 100%;
+            }
         }
     </style>
-    <title>Sunset Gradient</title>
+    <title>Animated Sunset</title>
 </head>
 <body>
-    <div class="sunset"></div>
+    <div class="sunset">
+        <div class="sun"></div>
+    </div>
 </body>
 </html>
