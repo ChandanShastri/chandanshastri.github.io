@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="Description" content="Official Site of Chandan Shastri">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Chandan Shastri's Showcase</title>
+
+  <style>
+    /* Global Styles */
+    :root {
+      --primary-color: #2c3e50; /* Dark Blue/Charcoal */
+      --accent-color: #3498db; /* Bright Blue */
+      --text-color: #333;
+      --light-gray: #ecf0f1;
+      --card-bg: #fff;
+      --shadow-color: rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--light-gray);
+      color: var(--text-color);
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    /* Typography & Separators */
+    h6 {
+      margin: 0;
+      font-size: 1.1em;
+      color: var(--primary-color);
+    }
+
+    hr {
+      border: none;
+      height: 1px;
+      background-color: #ddd;
+      margin: 20px 0;
+    }
+
+    a {
+      color: var(--accent-color);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    a:hover {
+      color: #2980b9;
+    }
+
+    /* Profile Section */
+    .profile-img-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .circle {
+      border-radius: 50%;
+      border: 4px solid var(--card-bg);
+      box-shadow: 0 0 10px var(--shadow-color);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .hoverable:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: default;
+      font-weight: 500;
+      color: var(--primary-color);
+    }
+
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 250px;
+      background-color: var(--primary-color);
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px 10px;
+      position: absolute;
+      z-index: 1;
+      bottom: 150%;
+      left: 50%;
+      margin-left: -125px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.8em;
+      white-space: nowrap;
+    }
+
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Card Component */
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px var(--shadow-color);
+      margin: 25px 0;
+      overflow: hidden;
+    }
+
+    .card-content {
+      padding: 20px;
+    }
+
+    .card-content.lighten-4 {
+      background-color: #f7f7f7;
+    }
+
+    /* Tabs Component */
+    .card-tabs {
+      border-bottom: 1px solid #ddd;
+    }
+
+    .tabs {
+      display: flex;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      justify-content: space-around;
+      background-color: #eee;
+    }
+
+    .tab {
+      flex: 1;
+      text-align: center;
+    }
+
+    .tab a {
+      display: block;
+      padding: 15px 10px;
+      color: var(--text-color);
+      font-weight: 600;
+      transition: background-color 0.3s, color 0.3s;
+      border-bottom: 3px solid transparent;
+    }
+
+    .tab a:hover {
+      background-color: #e0e0e0;
+    }
+
+    .tab a.active {
+      color: var(--accent-color);
+      border-bottom: 3px solid var(--accent-color);
+      background-color: var(--card-bg);
+    }
+    
+    /* Content within Tabs */
+    #bigdata, #cs_techtalks, #cs_ml, #cs_films, #cs_apps {
+        /* Initial state is handled by JS but added here for fallback */
+        display: none; 
+        padding: 20px 0;
+        text-align: center;
+    }
+    /* Default active tab must be visible */
+    #cs_techtalks {
+        display: block; 
+    }
+
+
+    /* Buttons */
+    button, .btn-small {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9em;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: background-color 0.3s, box-shadow 0.3s;
+      margin: 5px;
+      display: inline-block;
+    }
+
+    button:hover, .btn-small:hover {
+      background-color: #2980b9;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .disabled {
+      background-color: #95a5a6;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .disabled:hover {
+      background-color: #95a5a6;
+    }
+
+    /* Embeds */
+    iframe {
+      border-radius: 6px;
+      width: 100%; /* Make iframe responsive */
+      max-width: 400px;
+      height: 250px; /* Adjust height */
+    }
+
+    /* Footer */
+    #footer-mobile {
+      text-align: center;
+      padding: 20px 0;
+      font-size: 0.9em;
+      color: #777;
+    }
+    
+    ol {
+        text-align: left;
+        display: inline-block;
+        margin-top: 15px;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <br>
+    <div class="profile-img-container">
+      <img width="150px" height="150px" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSI3NSIgY3k9Ijc1IiByPSI3NSIgZmlsbD0iI2NjY2NjYyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEycHgiIGZpbGw9IiM0NDQiPmNoYW5kYW5zaGFzdHJpLmpwZzwvcmVwbGFjZW1lbnQ+PC90ZXh0Pjwvc3ZnPg==" alt="Chandan Shastri" class="hoverable circle">
+    </div>
+
+    <center>
+      <div class="tooltip">
+        <span class="tooltiptext">A Developer who develops Programs, Products, and Stories</span>
+        <div id="year"></div>
+      </div>
+    </center>
+    <br>
+    <hr>
+    
+    <center>
+      <a href="https://linkedin.com/in/chandanshastri" rel="noopener" target="_blank"><b>LinkedIn</b></a> |
+      <a href="https://github.com/ChandanShastri" rel="noopener" target="_blank"><b>GitHub</b></a> |
+      <a href="https://medium.com/@chandan-shastri" rel="noopener" target="_blank"><b>Medium</b></a> |
+      <a href="https://youtube.com/c/chandanshastri" rel="noopener" target="_blank"><b>YouTube</b></a>
+    </center>
+    
+    <hr>
+    <br>
+
+    <div class="card">
+      <div class="card-content">
+        <p><center>I am working on some other projects right now,<br>
+          So I didn't get enough time to work on my own Site...!<br><br>
+          But you can checkout my projects below :</center></p>
+      </div>
+      
+      <div class="card-tabs">
+        <ul class="tabs">
+          <li class="tab"><a class="active" href="#cs_techtalks">Tech Talks</a></li>
+          <li class="tab"><a href="#bigdata">Big Data</a></li>
+          <li class="tab"><a href="#cs_apps">Apps &amp; more</a></li>
+          <li class="tab"><a href="#cs_ml">ML &amp; AI</a></li>
+          <li class="tab"><a href="#cs_films">FILMS</a></li>
+        </ul>
+      </div>
+      
+      <div class="card-content lighten-4">
+
+        <div id="cs_techtalks">
+          <br>
+          <iframe title="Chandan Shastri's Talks" src="https://www.youtube.com/embed/HqDNjKnf98M" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          <br>
+        </div>
+
+        <div id="bigdata">
+          <span>Checkout My Custom DataScience Workspace ( aka cs_ds ),<br>Specially crafted for plug and play development on Hadoop and Spark.<br>
+            <br><i>System Requirements : Docker Desktop, Min. 8 GB RAM, Min. 6 GB Disk Space. </i> 
+            <br><br><a rel="noopener" target="_blank" href='https://medium.com/@chandanrshastri/custom-data-science-workspace-using-docker-6629f5218ccd'><b>Read the Backstory</b></a><br>
+            <br>
+            <b>docker pull chandanshastri/cs_ds_v1.21</b><br>
+            <b>docker run --hostname csds --name cs_ds -it --entrypoint /bin/bash chandanshastri/cs_ds_v1.21:latest</b>
+            <br><br><hr>
+            <br>Don't want to bother with Docker on Windows ?<br>
+            <a href='https://sourceforge.net/projects/chandanshastri-csds/files/' rel="noopener" target="_blank">Download my Custom Package instead</a><br>
+            <br><i>( Includes Compatible Python Installer and JDK )</i>
+            <br><br> <b>Instructions :</b> <br>Extract -> Run the setup.cmd -> view the generated README file.<br>Configure hdfs-site.xml and spark-defaults.conf files.<br> ( Replace '\' with '/' in paths )
+            <br>
+          </span>
+        </div>
+
+        <div id="cs_ml">
+          <button type="button" class="btn-small disabled">( Under Construction )</button>
+        </div>
+        
+        <div id="cs_films">
+          <button type="button" class="btn-small disabled">( Under Construction )</button>
+        </div>
+
+        <div id="cs_apps">
+          <a href="https://hub.docker.com/u/chandanshastri" rel="noopener" target="_blank">
+            <button type="button" class="btn-small">Chandan on Docker Hub</button>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <br><hr>
+    <br>
+
+    <div class="card">
+      <div class="card-content">
+        <p><center><b><h6>Casual Research</b></center></h6>
+          <ol>
+            <li><a href="https://youtu.be/HqDNjKnf98M" rel="noopener" target="_blank" >Night Mode on Smartphones and Computational Photography</a></li>
+            <li><a href="csds/datascience.html" rel="noopener" target="_blank" >Weather Data Processing and Prediction ( in Progress )</a></li>
+          </ol>
+        </p>
+      </div>
+    </div>
+
+    <br><hr><br>
+    
+    <div class="card">
+      <div class="card-content">
+        <p><center><b><h6>Casual Writings</b></center></h6><br>
+          <center>
+            <a href="https://medium.com/@chandan-shastri" rel="noopener" target="_blank">
+              <button type="button" class="btn-small">Chandan on Medium</button>
+            </a>
+          </center>
+        </p>
+      </div>
+    </div>
+    
+    <br><hr><br>
+
+    <center>
+      <img width='150px' height='150px' src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI2NjY2NjYyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEycHgiIGZpbGw9IiM0NDQiPmNzX2xvZ28ucG5nOiBQbGFjZWhvbGRlcjwvdGV4dD48L3N2Zz4=" class="circle" alt="Chandan Shastri's Logo">
+    </center>
+    
+    <div id="footer-mobile"></div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 1. Footer and Year Logic
+      // Check for screen width and update footer
+      if (window.innerWidth < 720) {
+        document.getElementById('footer-mobile').innerHTML = "<br><br><footer><center><font> Looks like you are on a phone. </font></center><br><br></footer>";
+      }
+
+      // Update copyright year
+      document.getElementById('year').innerHTML = "&copy; Chandan Shastri - " + (new Date().getFullYear());
+
+      // 2. Tab Switching Logic (Replaces Materialize CSS dependency)
+      const tabs = document.querySelectorAll('.tabs .tab a');
+      const contents = document.querySelectorAll('.card-content.lighten-4 > div[id^="cs_"], .card-content.lighten-4 > div[id="bigdata"]');
+
+      function showTab(targetId) {
+        // Hide all content divs
+        contents.forEach(content => {
+          content.style.display = 'none';
+        });
+
+        // Deactivate all tabs
+        tabs.forEach(tab => {
+          tab.classList.remove('active');
+        });
+
+        // Show target content
+        const targetContent = document.getElementById(targetId);
+        if (targetContent) {
+          targetContent.style.display = 'block';
+        }
+
+        // Activate the corresponding tab link
+        const activeTabLink = document.querySelector(`.tab a[href="#${targetId}"]`);
+        if (activeTabLink) {
+          activeTabLink.classList.add('active');
+        }
+      }
+
+      // Add click listeners to tabs
+      tabs.forEach(tabLink => {
+        tabLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          const targetId = this.getAttribute('href').substring(1);
+          showTab(targetId);
+        });
+      });
+
+      // Initialize: Show the first tab content on load
+      const firstTabId = tabs[0].getAttribute('href').substring(1);
+      showTab(firstTabId);
+    });
+  </script>
+</body>
+</html>
