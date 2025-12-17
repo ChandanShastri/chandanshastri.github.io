@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalSSL Studio - Client-Side Certificate Generator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Forge Crypto Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/forge/1.3.1/forge.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom scrollbar for textareas */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #0f172a; 
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #334155; 
+            border-radius: 4px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #475569; 
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hidden-el {
+            display: none !important;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans antialiased selection:bg-indigo-500 selection:text-white min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-slate-800 border-b border-slate-700 shadow-lg shrink-0">
+        <div class="max-w-7xl mx-auto px-4 py-5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 p-2 rounded-lg">
+                    <i data-lucide="shield" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">LocalSSL Studio</h1>
+                    <p class="text-xs text-slate-400">Client-Side Certificate Generator</p>
+                </div>
+            </div>
+            <div class="hidden sm:flex items-center gap-2 text-xs font-mono text-emerald-400 bg-emerald-400/10 px-3 py-1 rounded-full border border-emerald-400/20">
+                <i data-lucide="lock" class="w-3 h-3"></i>
+                <span>Secure Environment: Keys never leave your browser</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 w-full">
+        
+        <!-- Left Column: Configuration -->
+        <div class="lg:col-span-5 space-y-6">
+            
+            <!-- Mode Switcher -->
+            <div class="bg-slate-800 p-1 rounded-lg flex shadow-sm">
+                <button id="btn-mode-cert" class="flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-all bg-indigo-600 text-white shadow-md">
+                    <i data-lucide="file-text" class="w-4 h-4"></i> Self-Signed Cert
+                </button>
+                <button id="btn-mode-csr" class="flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-all text-slate-400 hover:text-slate-200">
+                    <i data-lucide="server" class="w-4 h-4"></i> CSR Generator
+                </button>
+            </div>
+
+            <!-- Form Card -->
+            <div class="bg-slate-800 rounded-xl border border-slate-700 shadow-xl overflow-hidden">
+                <div class="p-6 space-y-5">
+                    
+                    <!-- Common Name -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Common Name (CN)</label>
+                        <div class="relative">
+                            <i data-lucide="globe" class="absolute left-3 top-2.5 w-5 h-5 text-slate-500"></i>
+                            <input type="text" id="commonName" value="localhost"
+                                class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                                placeholder="e.g., example.com or localhost">
+                        </div>
+                    </div>
+
+                    <!-- SANs (Only for Cert) -->
+                    <div id="san-container">
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Subject Alt Names (SANs)</label>
+                        <input type="text" id="san" value="localhost, 127.0.0.1"
+                            class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2.5 px-4 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                            placeholder="localhost, 127.0.0.1, www.example.com">
+                        <p class="text-xs text-slate-500 mt-1">Comma separated IPs or Domains. Required for Chrome/Edge.</p>
+                    </div>
+
+                    <!-- Grid Inputs -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Organization (O)</label>
+                            <input type="text" id="organization" value="My Company Dev" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Org Unit (OU)</label>
+                            <input type="text" id="department" value="Engineering" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">City/Locality (L)</label>
+                            <input type="text" id="locality" value="San Francisco" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">State/Province (ST)</label>
+                            <input type="text" id="state" value="California" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Country Code (C)</label>
+                            <input type="text" id="country" value="US" maxlength="2" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        
+                        <div id="validity-container">
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Validity (Days)</label>
+                            <input type="number" id="validityDays" value="365" class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Key Config -->
+                    <div class="pt-4 border-t border-slate-700">
+                        <label class="block text-sm font-medium text-slate-400 mb-2">Private Key Strength</label>
+                        <div class="grid grid-cols-2 gap-3">
+                           <button id="btn-key-2048" class="border rounded-lg py-2 text-sm transition-all border-indigo-500 bg-indigo-500/10 text-indigo-400">
+                             2048-bit (Standard)
+                           </button>
+                           <button id="btn-key-4096" class="border rounded-lg py-2 text-sm transition-all border-slate-700 text-slate-500 hover:border-slate-600">
+                             4096-bit (Slow)
+                           </button>
+                        </div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button id="btn-generate" class="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-bold py-3 rounded-lg shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2">
+                        <span id="btn-text-idle" class="flex items-center gap-2">
+                            <i data-lucide="key" class="w-5 h-5"></i>
+                            <span id="generate-label">Generate Certificate</span>
+                        </span>
+                        <span id="btn-text-loading" class="hidden-el flex items-center gap-2">
+                            <i data-lucide="refresh-cw" class="w-5 h-5 animate-spin"></i>
+                            Processing...
+                        </span>
+                    </button>
+                    
+                    <p id="progress-text" class="text-center text-xs text-indigo-400 animate-pulse h-4"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Output -->
+        <div class="lg:col-span-7 space-y-6 flex flex-col h-full">
+            
+            <!-- Empty State -->
+            <div id="empty-state" class="h-full min-h-[400px] bg-slate-800/50 border border-slate-700 border-dashed rounded-xl flex flex-col items-center justify-center text-slate-500 p-8 text-center">
+               <i data-lucide="shield" class="w-16 h-16 mb-4 opacity-20"></i>
+               <h3 class="text-lg font-medium text-slate-400">Ready to Generate</h3>
+               <p class="max-w-md text-sm mt-2">
+                 Fill out the details on the left and click Generate. 
+                 The calculations happen locally in your browser using the <span class="font-mono text-indigo-400">node-forge</span> library.
+               </p>
+               <div class="mt-6 flex gap-4 text-xs bg-slate-900/50 p-4 rounded-lg">
+                  <div class="flex items-center gap-2">
+                    <i data-lucide="check" class="w-4 h-4 text-green-500"></i> No server uploads
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <i data-lucide="check" class="w-4 h-4 text-green-500"></i> Private Key is safe
+                  </div>
+               </div>
+            </div>
+
+            <!-- Results State -->
+            <div id="results-state" class="hidden-el space-y-6 fade-in">
+              
+                <!-- Result Header -->
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-semibold text-white">Generated Assets</h2>
+                    <div class="flex gap-2">
+                        <button onclick="downloadPrivateKey()" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-2 rounded-lg border border-slate-600 transition-colors">
+                            <i data-lucide="download" class="w-3 h-3"></i> Download Key
+                        </button>
+                        <button onclick="downloadCertificate()" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-2 rounded-lg border border-slate-600 transition-colors">
+                            <i data-lucide="download" class="w-3 h-3"></i> <span id="download-cert-label">Download Cert</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Warnings -->
+                <div id="self-signed-warning" class="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 flex gap-3 items-start">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-500 shrink-0 mt-0.5"></i>
+                    <div>
+                        <h4 class="text-sm font-bold text-amber-500">Self-Signed Certificate Notice</h4>
+                        <p class="text-xs text-amber-200/80 mt-1 leading-relaxed">
+                            Browsers will mark this certificate as "Not Secure" because it wasn't signed by a trusted Authority (CA). 
+                            You will need to manually accept the risk or add it to your OS trust store for local development.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Certificate Output -->
+                <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+                    <div class="bg-slate-900/50 px-4 py-3 border-b border-slate-700 flex justify-between items-center">
+                        <span id="output-filename" class="text-xs font-mono text-indigo-300">certificate.crt</span>
+                        <button onclick="copyCert()" class="text-slate-400 hover:text-white transition-colors" title="Copy">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <div class="relative group">
+                        <textarea id="output-cert" readonly class="w-full h-48 bg-slate-900 text-slate-300 font-mono text-xs p-4 focus:outline-none resize-none"></textarea>
+                    </div>
+                </div>
+
+                <!-- Private Key Output -->
+                <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+                    <div class="bg-slate-900/50 px-4 py-3 border-b border-slate-700 flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-mono text-rose-300">private.key</span>
+                            <span class="text-[10px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded border border-rose-500/30">DO NOT SHARE</span>
+                        </div>
+                        <button onclick="copyKey()" class="text-slate-400 hover:text-white transition-colors" title="Copy">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <div class="relative group">
+                        <textarea id="output-key" readonly class="w-full h-48 bg-slate-900 text-rose-200/80 font-mono text-xs p-4 focus:outline-none resize-none"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // State
+        let state = {
+            mode: 'CERT', // 'CERT' or 'CSR'
+            keySize: 2048,
+            generated: null // { privateKey, certificate, type }
+        };
+
+        // DOM Elements
+        const btnModeCert = document.getElementById('btn-mode-cert');
+        const btnModeCsr = document.getElementById('btn-mode-csr');
+        const sanContainer = document.getElementById('san-container');
+        const validityContainer = document.getElementById('validity-container');
+        const btnKey2048 = document.getElementById('btn-key-2048');
+        const btnKey4096 = document.getElementById('btn-key-4096');
+        const btnGenerate = document.getElementById('btn-generate');
+        const btnTextIdle = document.getElementById('btn-text-idle');
+        const btnTextLoading = document.getElementById('btn-text-loading');
+        const progressText = document.getElementById('progress-text');
+        const generateLabel = document.getElementById('generate-label');
+        
+        const emptyState = document.getElementById('empty-state');
+        const resultsState = document.getElementById('results-state');
+        const warningBox = document.getElementById('self-signed-warning');
+        
+        const outputCert = document.getElementById('output-cert');
+        const outputKey = document.getElementById('output-key');
+        const outputFilename = document.getElementById('output-filename');
+        const downloadCertLabel = document.getElementById('download-cert-label');
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Event Listeners for Mode Switching
+        btnModeCert.addEventListener('click', () => setMode('CERT'));
+        btnModeCsr.addEventListener('click', () => setMode('CSR'));
+
+        // Event Listeners for Key Size
+        btnKey2048.addEventListener('click', () => setKeySize(2048));
+        btnKey4096.addEventListener('click', () => setKeySize(4096));
+
+        // Generate Event
+        btnGenerate.addEventListener('click', generate);
+
+        // --- Functions ---
+
+        function setMode(mode) {
+            state.mode = mode;
+            
+            // Update UI Buttons
+            if (mode === 'CERT') {
+                btnModeCert.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
+                btnModeCert.classList.remove('text-slate-400', 'hover:text-slate-200');
+                
+                btnModeCsr.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
+                btnModeCsr.classList.add('text-slate-400', 'hover:text-slate-200');
+
+                sanContainer.classList.remove('hidden-el');
+                validityContainer.classList.remove('hidden-el');
+                generateLabel.innerText = "Generate Certificate";
+            } else {
+                btnModeCsr.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
+                btnModeCsr.classList.remove('text-slate-400', 'hover:text-slate-200');
+
+                btnModeCert.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
+                btnModeCert.classList.add('text-slate-400', 'hover:text-slate-200');
+
+                sanContainer.classList.add('hidden-el');
+                validityContainer.classList.add('hidden-el');
+                generateLabel.innerText = "Generate CSR";
+            }
+        }
+
+        function setKeySize(size) {
+            state.keySize = size;
+            if (size === 2048) {
+                btnKey2048.className = "border rounded-lg py-2 text-sm transition-all border-indigo-500 bg-indigo-500/10 text-indigo-400";
+                btnKey4096.className = "border rounded-lg py-2 text-sm transition-all border-slate-700 text-slate-500 hover:border-slate-600";
+            } else {
+                btnKey4096.className = "border rounded-lg py-2 text-sm transition-all border-indigo-500 bg-indigo-500/10 text-indigo-400";
+                btnKey2048.className = "border rounded-lg py-2 text-sm transition-all border-slate-700 text-slate-500 hover:border-slate-600";
+            }
+        }
+
+        function getFormData() {
+            return {
+                commonName: document.getElementById('commonName').value,
+                organization: document.getElementById('organization').value,
+                department: document.getElementById('department').value,
+                locality: document.getElementById('locality').value,
+                state: document.getElementById('state').value,
+                country: document.getElementById('country').value,
+                validityDays: document.getElementById('validityDays').value,
+                san: document.getElementById('san').value
+            };
+        }
+
+        async function generate() {
+            if (typeof forge === 'undefined') {
+                alert("Forge library not loaded. Please ensure you have internet access.");
+                return;
+            }
+
+            // Set Loading UI
+            btnGenerate.disabled = true;
+            btnTextIdle.classList.add('hidden-el');
+            btnTextLoading.classList.remove('hidden-el');
+            progressText.innerText = "Initializing cryptographic engine...";
+            
+            // Use setTimeout to allow UI to render before blocking CPU
+            setTimeout(() => {
+                try {
+                    const data = getFormData();
+                    const pki = forge.pki;
+                    
+                    // 1. Generate Key Pair
+                    progressText.innerText = `Generating ${state.keySize}-bit RSA Key Pair (this may take a moment)...`;
+                    const keys = pki.rsa.generateKeyPair(state.keySize);
+
+                    // 2. Generate Cert or CSR
+                    if (state.mode === 'CERT') {
+                        createSelfSignedCert(pki, keys, data);
+                    } else {
+                        createCSR(pki, keys, data);
+                    }
+
+                } catch (err) {
+                    console.error(err);
+                    alert("Error: " + err.message);
+                    resetLoadingUI();
+                }
+            }, 100);
+        }
+
+        function createSelfSignedCert(pki, keys, data) {
+            progressText.innerText = 'Formatting X.509 Certificate...';
+            
+            const cert = pki.createCertificate();
+            cert.publicKey = keys.publicKey;
+            cert.serialNumber = '01' + forge.util.bytesToHex(forge.random.getBytesSync(16));
+            
+            // Validity
+            cert.validity.notBefore = new Date();
+            cert.validity.notAfter = new Date();
+            cert.validity.notAfter.setDate(cert.validity.notBefore.getDate() + parseInt(data.validityDays));
+
+            // Attributes
+            const attrs = [
+                { name: 'commonName', value: data.commonName },
+                { name: 'countryName', value: data.country },
+                { shortName: 'ST', value: data.state },
+                { name: 'localityName', value: data.locality },
+                { name: 'organizationName', value: data.organization },
+                { shortName: 'OU', value: data.department }
+            ];
+
+            cert.setSubject(attrs);
+            cert.setIssuer(attrs); // Self-signed
+
+            // Extensions
+            const extensions = [
+                { name: 'basicConstraints', cA: true },
+                { name: 'keyUsage', keyCertSign: true, digitalSignature: true, nonRepudiation: true, keyEncipherment: true, dataEncipherment: true },
+                { name: 'extKeyUsage', serverAuth: true, clientAuth: true, codeSigning: true, emailProtection: true, timeStamping: true },
+                { name: 'nsCertType', client: true, server: true, email: true, objsign: true, sslCA: true, emailCA: true, objCA: true },
+                { name: 'subjectKeyIdentifier' }
+            ];
+
+            if (data.san) {
+                const sanEntries = data.san.split(',').map(item => item.trim()).filter(i => i);
+                if (sanEntries.length > 0) {
+                    const altNames = sanEntries.map(entry => {
+                        const isIp = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(entry);
+                        return isIp ? { type: 7, ip: entry } : { type: 2, value: entry };
+                    });
+                    extensions.push({
+                        name: 'subjectAltName',
+                        altNames: altNames
+                    });
+                }
+            }
+            cert.setExtensions(extensions);
+
+            // Sign
+            progressText.innerText = 'Signing Certificate...';
+            cert.sign(keys.privateKey, forge.md.sha256.create());
+
+            // Convert
+            const pemKey = pki.privateKeyToPem(keys.privateKey);
+            const pemCert = pki.certificateToPem(cert);
+
+            showResults(pemKey, pemCert, 'CERT');
+        }
+
+        function createCSR(pki, keys, data) {
+            progressText.innerText = 'Creating Certificate Signing Request...';
+            
+            const csr = pki.createCertificationRequest();
+            csr.publicKey = keys.publicKey;
+
+            const attrs = [
+                { name: 'commonName', value: data.commonName },
+                { name: 'countryName', value: data.country },
+                { shortName: 'ST', value: data.state },
+                { name: 'localityName', value: data.locality },
+                { name: 'organizationName', value: data.organization },
+                { shortName: 'OU', value: data.department }
+            ];
+
+            csr.setSubject(attrs);
+            csr.sign(keys.privateKey, forge.md.sha256.create());
+
+            const pemKey = pki.privateKeyToPem(keys.privateKey);
+            const pemCsr = pki.certificationRequestToPem(csr);
+
+            showResults(pemKey, pemCsr, 'CSR');
+        }
+
+        function showResults(key, cert, type) {
+            state.generated = {
+                privateKey: key,
+                certificate: cert,
+                type: type
+            };
+
+            // Reset Loading
+            resetLoadingUI();
+
+            // Hide Empty, Show Results
+            emptyState.classList.add('hidden-el');
+            resultsState.classList.remove('hidden-el');
+
+            // Populate Textareas
+            outputKey.value = key;
+            outputCert.value = cert;
+
+            // Update Labels/Warnings
+            if (type === 'CERT') {
+                warningBox.classList.remove('hidden-el');
+                outputFilename.innerText = 'certificate.crt';
+                downloadCertLabel.innerText = 'Download Cert';
+            } else {
+                warningBox.classList.add('hidden-el');
+                outputFilename.innerText = 'request.csr';
+                downloadCertLabel.innerText = 'Download CSR';
+            }
+            
+            // Scroll to results (on mobile)
+            resultsState.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetLoadingUI() {
+            btnGenerate.disabled = false;
+            btnTextIdle.classList.remove('hidden-el');
+            btnTextLoading.classList.add('hidden-el');
+            progressText.innerText = '';
+        }
+
+        // --- Utils ---
+
+        function downloadFile(filename, content) {
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
+            element.setAttribute('download', filename);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+
+        function downloadPrivateKey() {
+            if (state.generated) {
+                downloadFile('private.key', state.generated.privateKey);
+            }
+        }
+
+        function downloadCertificate() {
+            if (state.generated) {
+                const filename = state.generated.type === 'CERT' ? 'certificate.crt' : 'request.csr';
+                downloadFile(filename, state.generated.certificate);
+            }
+        }
+
+        function copyToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+        }
+
+        function copyKey() {
+            if(state.generated) copyToClipboard(state.generated.privateKey);
+        }
+
+        function copyCert() {
+            if(state.generated) copyToClipboard(state.generated.certificate);
+        }
+
+    </script>
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-124730361-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-124730361-2');
+</script>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "dvrksvhehn");
+</script>
+
+</body>
+</html>
