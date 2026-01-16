@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="Description" content="Official Site of Chandan Shastri">
@@ -17,11 +18,15 @@
       --card-bg: #ffffff;
       --text-color: #333;
       --light-text: #666;
-      --shadow: 0 4px 6px rgba(0,0,0,0.1);
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       --radius: 12px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -36,20 +41,47 @@
     }
 
     /* --- Typography & Links --- */
-    a { text-decoration: none; color: var(--accent-color); transition: color 0.2s; }
-    a:hover { color: var(--primary-color); }
-    h6 { font-size: 1.1rem; margin-bottom: 10px; color: var(--primary-color); font-weight: 600; }
-    
+    a {
+      text-decoration: none;
+      color: var(--accent-color);
+      transition: color 0.2s;
+    }
+
+    a:hover {
+      color: var(--primary-color);
+    }
+
+    h6 {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+
     /* --- Layout Utilities --- */
     .container {
       width: 100%;
       max-width: 800px;
       margin: 0 auto;
     }
-    .text-center { text-align: center; }
-    .mt-4 { margin-top: 1.5rem; }
-    .mb-4 { margin-bottom: 1.5rem; }
-    hr { border: 0; border-top: 1px solid #ddd; margin: 20px 0; }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .mt-4 {
+      margin-top: 1.5rem;
+    }
+
+    .mb-4 {
+      margin-bottom: 1.5rem;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid #ddd;
+      margin: 20px 0;
+    }
 
     /* --- Profile Section --- */
     .profile-img {
@@ -60,7 +92,10 @@
       box-shadow: var(--shadow);
       transition: transform 0.3s ease;
     }
-    .profile-img:hover { transform: scale(1.05); }
+
+    .profile-img:hover {
+      transform: scale(1.05);
+    }
 
     .tooltip {
       position: relative;
@@ -68,6 +103,7 @@
       margin-top: 10px;
       cursor: default;
     }
+
     .tooltip .tooltiptext {
       visibility: hidden;
       width: 220px;
@@ -78,14 +114,19 @@
       padding: 5px 0;
       position: absolute;
       z-index: 1;
-      bottom: 125%; /* Position above */
+      bottom: 125%;
+      /* Position above */
       left: 50%;
       margin-left: -110px;
       opacity: 0;
       transition: opacity 0.3s;
       font-size: 0.85rem;
     }
-    .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
 
     .social-links {
       display: flex;
@@ -93,8 +134,16 @@
       gap: 15px;
       flex-wrap: wrap;
     }
-    .social-links a { font-weight: 600; color: var(--primary-color); }
-    .social-links a:hover { color: var(--accent-color); text-decoration: underline; }
+
+    .social-links a {
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .social-links a:hover {
+      color: var(--accent-color);
+      text-decoration: underline;
+    }
 
     /* --- Cards --- */
     .card {
@@ -105,16 +154,25 @@
       margin-bottom: 30px;
       padding: 0;
     }
-    .card-content { padding: 20px; }
-    .card-footer { background: #f9f9f9; padding: 20px; }
+
+    .card-content {
+      padding: 20px;
+    }
+
+    .card-footer {
+      background: #f9f9f9;
+      padding: 20px;
+    }
 
     /* --- Tabs System --- */
     .tab-nav {
       display: flex;
       border-bottom: 1px solid #eee;
       background: #fafafa;
-      overflow-x: auto; /* Scroll on mobile */
+      overflow-x: auto;
+      /* Scroll on mobile */
     }
+
     .tab-button {
       flex: 1;
       background: none;
@@ -127,18 +185,35 @@
       transition: all 0.3s;
       border-bottom: 3px solid transparent;
     }
-    .tab-button:hover { background-color: #eee; }
+
+    .tab-button:hover {
+      background-color: #eee;
+    }
+
     .tab-button.active {
       color: var(--accent-color);
       border-bottom: 3px solid var(--accent-color);
     }
+
     .tab-content {
       display: none;
       padding: 20px;
       animation: fadeIn 0.4s;
     }
-    .tab-content.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
 
     /* --- Buttons & Elements --- */
     .btn {
@@ -152,12 +227,17 @@
       cursor: pointer;
       transition: background 0.3s;
     }
-    .btn:hover { background-color: #2980b9; color: white; }
+
+    .btn:hover {
+      background-color: #2980b9;
+      color: white;
+    }
+
     .btn.disabled {
       background-color: #ccc;
       cursor: not-allowed;
     }
-    
+
     .code-block {
       background: #eee;
       padding: 2px 6px;
@@ -168,7 +248,10 @@
       margin: 2px 0;
     }
 
-    iframe { max-width: 100%; border-radius: 8px; }
+    iframe {
+      max-width: 100%;
+      border-radius: 8px;
+    }
 
     /* --- Footer Logo --- */
     .footer-logo {
@@ -176,7 +259,10 @@
       opacity: 0.8;
       transition: opacity 0.3s;
     }
-    .footer-logo:hover { opacity: 1; }
+
+    .footer-logo:hover {
+      opacity: 1;
+    }
   </style>
 </head>
 
@@ -190,11 +276,11 @@
       <span class="tooltiptext">A Developer who develops Programs, Products, and Stories</span>
       <div id="year" style="font-size: 0.9rem; margin-top: 10px; color: #888;"></div>
     </div>
-    
+
     <div id='welcomeback'></div>
-    
+
     <hr>
-    
+
     <div class="social-links">
       <a href="https://linkedin.com/in/chandanshastri" rel="noopener" target="_blank">LinkedIn</a>
       <a href="https://github.com/ChandanShastri" rel="noopener" target="_blank">GitHub</a>
@@ -208,44 +294,52 @@
     <div class="card">
       <div class="card-content text-center">
         <p>I am working on some other projects right now,<br>
-        So I didn't get enough time to work on my own Site...!<br><br>
-        But you can checkout my projects below:</p>
+          So I didn't get enough time to work on my own Site...!<br><br>
+          But you can checkout my projects below:</p>
       </div>
 
       <nav class="tab-nav">
         <button class="tab-button active" onclick="openTab(event, 'cs_techtalks')">Tech Talks</button>
         <button class="tab-button" onclick="openTab(event, 'bigdata')">Big Data</button>
         <button class="tab-button" onclick="openTab(event, 'cs_apps')">Apps &amp; more</button>
+        <button class="tab-button" onclick="openTab(event, 'cs_games')">Games</button>
         <button class="tab-button" onclick="openTab(event, 'cs_ml')">ML &amp; AI</button>
         <button class="tab-button" onclick="openTab(event, 'cs_films')">FILMS</button>
       </nav>
 
       <div class="card-footer text-center">
-        
+
         <div id="cs_techtalks" class="tab-content active">
-          <iframe title="Chandan Shastri's Talks" width="100%" height="315" style="max-width: 450px;" src="https://www.youtube.com/embed/HqDNjKnf98M" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          <iframe title="Chandan Shastri's Talks" width="100%" height="315" style="max-width: 450px;"
+            src="https://www.youtube.com/embed/HqDNjKnf98M" frameborder="0"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
 
         <div id="bigdata" class="tab-content">
           <p>Checkout My Custom DataScience Workspace (aka cs_ds),<br>
-          Specially crafted for plug and play development on Hadoop and Spark.</p>
+            Specially crafted for plug and play development on Hadoop and Spark.</p>
           <br>
           <p><i>System Requirements: Docker Desktop, Min. 8 GB RAM, Min. 6 GB Disk Space.</i></p>
           <br>
-          <a rel="noopener" target="_blank" href='https://medium.com/@chandanrshastri/custom-data-science-workspace-using-docker-6629f5218ccd'><b>Read the Backstory</b></a>
+          <a rel="noopener" target="_blank"
+            href='https://medium.com/@chandanrshastri/custom-data-science-workspace-using-docker-6629f5218ccd'><b>Read
+              the Backstory</b></a>
           <br><br>
-          <div style="text-align: left; background: #333; color: #fff; padding: 15px; border-radius: 6px; overflow-x: auto; font-family: monospace; font-size: 0.85rem;">
+          <div
+            style="text-align: left; background: #333; color: #fff; padding: 15px; border-radius: 6px; overflow-x: auto; font-family: monospace; font-size: 0.85rem;">
             docker pull chandanshastri/cs_ds_v1.21<br>
             docker run --hostname csds --name cs_ds -it --entrypoint /bin/bash chandanshastri/cs_ds_v1.21:latest
           </div>
           <br>
           <hr>
           <p>Don't want to bother with Docker on Windows?</p>
-          <a href='https://sourceforge.net/projects/chandanshastri-csds/files/' rel="noopener" target="_blank">Download my Custom Package instead</a>
+          <a href='https://sourceforge.net/projects/chandanshastri-csds/files/' rel="noopener" target="_blank">Download
+            my Custom Package instead</a>
           <br>
           <small><i>(Includes Compatible Python Installer and JDK)</i></small>
           <br><br>
-          <p><b>Instructions:</b><br>Extract -> Run the setup.cmd -> view the generated README file.<br>Configure hdfs-site.xml and spark-defaults.conf files.<br>(Replace '\' with '/' in paths)</p>
+          <p><b>Instructions:</b><br>Extract -> Run the setup.cmd -> view the generated README file.<br>Configure
+            hdfs-site.xml and spark-defaults.conf files.<br>(Replace '\' with '/' in paths)</p>
         </div>
 
         <div id="cs_ml" class="tab-content">
@@ -253,7 +347,11 @@
         </div>
 
         <div id="cs_apps" class="tab-content">
-          <a href="apps/certgen/index.html"><button type="button" class="btn disabled">Certificate Creator</button></a>
+          <a href="apps/certgen/index.html"><button type="button" class="btn">Certificate Creator</button></a>
+        </div>
+
+        <div id="cs_games" class="tab-content">
+          <a href="games/snake/index.html"><button type="button" class="btn">Snake Game</button></a>
         </div>
 
         <div id="cs_apps" class="tab-content">
@@ -271,8 +369,10 @@
           <h6>Pseudo Research (aka cs_pr)</h6>
         </div>
         <ol style="padding-left: 20px; max-width: 500px; margin: 0 auto;">
-          <li class="mb-4"><a href="https://youtu.be/HqDNjKnf98M" rel="noopener" target="_blank">Night Mode on Smartphones and Computational Photography</a></li>
-          <li><a href="csds/datascience.html" rel="noopener" target="_blank">Weather Data Processing and Prediction (in Progress)</a></li>
+          <li class="mb-4"><a href="https://youtu.be/HqDNjKnf98M" rel="noopener" target="_blank">Night Mode on
+              Smartphones and Computational Photography</a></li>
+          <li><a href="csds/datascience.html" rel="noopener" target="_blank">Weather Data Processing and Prediction (in
+              Progress)</a></li>
         </ol>
       </div>
     </div>
@@ -290,7 +390,7 @@
     <div class="text-center mb-4">
       <img src="imgs/cs_logo.png" class="footer-logo" alt="Chandan Shastri's Logo">
     </div>
-    
+
     <div id="footer-mobile"></div>
 
   </main>
@@ -316,10 +416,10 @@
     }
 
     // Date Logic
-    document.getElementById('year').innerHTML="&copy; Chandan Shastri - "+(new Date().getFullYear());
+    document.getElementById('year').innerHTML = "&copy; Chandan Shastri - " + (new Date().getFullYear());
 
     // Debugging Function
-    function cs_web () {
+    function cs_web() {
       console.log('Chandan Shastri\'s Workspace :  ')
       console.log(screen.width);
       console.log(window.screen.orientation)
@@ -329,7 +429,7 @@
     // Note: The original site had a check here to warn mobile users. 
     // This new CSS is responsive, so the warning is mostly redundant, 
     // but preserving the logic structure in case you want to insert a specific mobile footer.
-    if(screen.width < 720) {
+    if (screen.width < 720) {
       // Intentionally left blank or can be used for specific mobile-only text
       // document.getElementById('footer-mobile').innerHTML="..."; 
     }
@@ -338,18 +438,19 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-124730361-2"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
     gtag('config', 'UA-124730361-2');
   </script>
 
   <script type="text/javascript">
-      (function(c,l,a,r,i,t,y){
-          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-      })(window, document, "clarity", "script", "dvrksvhehn");
+    (function (c, l, a, r, i, t, y) {
+      c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+      t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+      y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+    })(window, document, "clarity", "script", "dvrksvhehn");
   </script>
 
 </body>
+
 </html>
