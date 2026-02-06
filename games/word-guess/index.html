@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Guess Game</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-color: #f8fafc;
+            --accent-color: #38bdf8;
+            --accent-hover: #0ea5e9;
+            --success-color: #4ade80;
+            --error-color: #f87171;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 40%);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 3rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.05em;
+        }
+
+        .word-display {
+            font-size: 3rem;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.5rem;
+            margin: 2rem 0;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+            min-height: 4rem;
+        }
+
+        .input-group {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 1rem;
+            box-sizing: border-box;
+            background: rgba(15, 23, 42, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: var(--font-family);
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: #0f172a;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(56, 189, 248, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .message {
+            margin-top: 1.5rem;
+            font-size: 1.1rem;
+            height: 1.5rem;
+            font-weight: 500;
+        }
+
+        .message.success {
+            color: var(--success-color);
+        }
+
+        .message.error {
+            color: var(--error-color);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Confetti */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f0f;
+            animation: confetti-fall 3s linear forwards;
+            top: -10px;
+            z-index: 100;
+            display: none;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Word Guess</h1>
+
+        <div class="word-display" id="wordDisplay">_ _ _ _ _</div>
+
+        <div class="input-group">
+            <input type="text" id="guessInput" placeholder="Type your guess here..." autocomplete="off">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-primary" onclick="checkGuess()">Check Guess</button>
+            <button class="btn-secondary" onclick="revealWord()">Reveal Code</button>
+            <button class="btn-secondary" onclick="newGame()">New Word</button>
+        </div>
+
+        <div class="message" id="messageArea"></div>
+    </div>
+
+    <script>
+        // Fallback words just in case API fails
+        const fallbackWords = [
+            "ALGORITHM", "BROWSER", "COMPILER", "DEBUGGER", "ENCRYPTION", "FRAMEWORK",
+            "GIGABYTE", "HTML", "INTERFACE", "JAVASCRIPT", "KERNEL", "LINUX", "MONITOR",
+            "NETWORK", "OBJECT", "PROGRAM", "QUERY", "ROUTER", "SERVER", "TERMINAL",
+            "UNICODE", "VARIABLE", "WIDGET", "XML", "PYTHON", "REACT", "ANTIGRAVITY",
+            "DATABASE", "FUNCTION", "VARIABLE", "SYNTAX", "LOOP"
+        ];
+
+        let currentWord = "";
+        let maskedWord = "";
+        let isLoading = false;
+
+        function getRandomInt(max) {
+            return Math.floor(Math.random() * max);
+        }
+
+        function maskWord(word) {
+            const splitWord = word.split('');
+            const maskCount = Math.floor(word.length * 0.6); // Mask 60% of letters
+            const indices = new Set();
+
+            while (indices.size < maskCount) {
+                indices.add(getRandomInt(word.length));
+            }
+
+            return splitWord.map((char, index) => indices.has(index) ? '_' : char).join(' ');
+        }
+
+        async function fetchWords() {
+            const titleDisplay = document.querySelector('h1');
+            const originalTitle = titleDisplay.innerText;
+
+            try {
+                titleDisplay.innerText = "Loading Word...";
+                // Fetch random articles from Wikipedia
+                const response = await fetch("https://en.wikipedia.org/w/api.php?origin=*&action=query&generator=random&grnnamespace=0&prop=extracts&explaintext&format=json");
+                const data = await response.json();
+
+                if (!data.query || !data.query.pages) {
+                    throw new Error("No pages found");
+                }
+
+                const pages = data.query.pages;
+                let candidateWords = [];
+
+                // Extract words from all pages returned
+                Object.values(pages).forEach(page => {
+                    const text = page.extract;
+                    if (text) {
+                        // Split by non-word characters and filter
+                        const words = text.split(/[^a-zA-Z]+/);
+                        const validWords = words.filter(word => {
+                            return word.length >= 5 && word.length <= 12 && /^[A-Z]+$/i.test(word);
+                        });
+                        candidateWords = candidateWords.concat(validWords);
+                    }
+                });
+
+                if (candidateWords.length === 0) {
+                    throw new Error("No suitable words found");
+                }
+
+                return candidateWords.map(w => w.toUpperCase());
+
+            } catch (e) {
+                console.error("Failed to fetch from Wikipedia", e);
+                document.getElementById('messageArea').innerText = "Using offline word list.";
+                return fallbackWords;
+            } finally {
+                titleDisplay.innerText = originalTitle;
+            }
+        }
+
+        async function newGame() {
+            if (isLoading) return;
+            isLoading = true;
+
+            document.getElementById('wordDisplay').innerText = "Loading...";
+            document.getElementById('wordDisplay').style.opacity = "0.5";
+
+            // Disable buttons
+            const btns = document.querySelectorAll('button');
+            btns.forEach(b => b.disabled = true);
+
+            try {
+                // We'll try to get fresh batch of words, or just pick one if we recently fetched?
+                // For simplicity, let's fetch a small batch every time to ensure randomness "from the web"
+                // Start the fetch
+                const candidates = await fetchWords();
+
+                // Pick a random one from candidates
+                const randomIndex = getRandomInt(candidates.length);
+                currentWord = candidates[randomIndex];
+                maskedWord = maskWord(currentWord);
+
+                document.getElementById('wordDisplay').innerText = maskedWord;
+                document.getElementById('wordDisplay').style.opacity = "1";
+                document.getElementById('guessInput').value = '';
+                document.getElementById('messageArea').innerText = '';
+                document.getElementById('guessInput').disabled = false;
+                document.getElementById('guessInput').focus();
+
+                // Remove confetti
+                document.querySelectorAll('.confetti').forEach(e => e.remove());
+            } catch (e) {
+                // Fallback logic handled in fetchWords return, but just in case
+                currentWord = fallbackWords[getRandomInt(fallbackWords.length)];
+                maskedWord = maskWord(currentWord);
+                document.getElementById('wordDisplay').innerText = maskedWord;
+                document.getElementById('wordDisplay').style.opacity = "1";
+            } finally {
+                isLoading = false;
+                btns.forEach(b => b.disabled = false);
+            }
+        }
+
+        function revealWord() {
+            document.getElementById('wordDisplay').innerText = currentWord.split('').join(' ');
+            document.getElementById('messageArea').className = 'message';
+            document.getElementById('messageArea').innerText = "The word was " + currentWord;
+            document.getElementById('guessInput').disabled = true;
+        }
+
+        function checkGuess() {
+            const userGuess = document.getElementById('guessInput').value.trim().toUpperCase();
+            const messageArea = document.getElementById('messageArea');
+
+            if (!userGuess) {
+                messageArea.innerText = "Please enter a guess!";
+                messageArea.className = 'message';
+                return;
+            }
+
+            if (userGuess === currentWord) {
+                messageArea.innerText = "Correct! You win!";
+                messageArea.className = 'message success';
+                document.getElementById('wordDisplay').innerText = currentWord.split('').join(' ');
+                document.getElementById('guessInput').disabled = true;
+                celebrate();
+            } else {
+                messageArea.innerText = "Wrong! Try again.";
+                messageArea.className = 'message error';
+
+                // Shake effect
+                const container = document.querySelector('.container');
+                container.style.animation = 'none';
+                container.offsetHeight; /* trigger reflow */
+                container.style.animation = 'shake 0.5s';
+            }
+        }
+
+        function celebrate() {
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                confetti.style.display = 'block';
+                document.body.appendChild(confetti);
+
+                setTimeout(() => confetti.remove(), 5000);
+            }
+        }
+
+        document.getElementById('guessInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                checkGuess();
+            }
+        });
+
+        // Add shake animation style
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+    `;
+        document.head.appendChild(styleSheet);
+
+        // Start game on load
+        newGame();
+
+    </script>
+</body>
+
+</html>
