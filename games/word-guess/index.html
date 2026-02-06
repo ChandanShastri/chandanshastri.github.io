@@ -216,6 +216,7 @@
         let currentWord = "";
         let maskedWord = "";
         let isLoading = false;
+        let wordQueue = []; // Queue to store words from fetched articles
 
         function getRandomInt(max) {
             return Math.floor(Math.random() * max);
@@ -233,14 +234,23 @@
             return splitWord.map((char, index) => indices.has(index) ? '_' : char).join(' ');
         }
 
+        // Fisher-Yates shuffle
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
         async function fetchWords() {
             const titleDisplay = document.querySelector('h1');
             const originalTitle = titleDisplay.innerText;
 
             try {
                 titleDisplay.innerText = "Loading Word...";
-                // Fetch random articles from Wikipedia
-                const response = await fetch("https://en.wikipedia.org/w/api.php?origin=*&action=query&generator=random&grnnamespace=0&prop=extracts&explaintext&format=json");
+                // Fetch multiple random articles from Wikipedia to build a queue
+                const response = await fetch("https://en.wikipedia.org/w/api.php?origin=*&action=query&generator=random&grnnamespace=0&prop=extracts&explaintext&format=json&grnlimit=10");
                 const data = await response.json();
 
                 if (!data.query || !data.query.pages) {
@@ -254,34 +264,64 @@
                 Object.values(pages).forEach(page => {
                     const text = page.extract;
                     if (text) {
-                        // Split by non-word characters and filter
+                        // Split by non-word characters
                         const words = text.split(/[^a-zA-Z]+/);
                         const validWords = words.filter(word => {
-                            return word.length >= 5 && word.length <= 12 && /^[A-Z]+$/i.test(word);
+                            // Strict Filtering:
+                            // 1. Length 5-12
+                            // 2. Must start with lowercase letter in the original text (excludes Proper nouns)
+                            return word.length >= 5 &&
+                                word.length <= 12 &&
+                                /^[a-z]/.test(word);
                         });
                         candidateWords = candidateWords.concat(validWords);
                     }
                 });
 
                 if (candidateWords.length === 0) {
-                    throw new Error("No suitable words found");
+                    // Return empty if no valid words found
+                    return [];
                 }
 
-                return candidateWords.map(w => w.toUpperCase());
+                // Deduplicate and convert to Uppercase for the game
+                return [...new Set(candidateWords)].map(w => w.toUpperCase());
 
             } catch (e) {
                 console.error("Failed to fetch from Wikipedia", e);
                 document.getElementById('messageArea').innerText = "Using offline word list.";
-                return fallbackWords;
+                return [];
             } finally {
                 titleDisplay.innerText = originalTitle;
             }
         }
 
+        function setGameWord(word) {
+            currentWord = word;
+            maskedWord = maskWord(currentWord);
+
+            document.getElementById('wordDisplay').innerText = maskedWord;
+            document.getElementById('wordDisplay').style.opacity = "1";
+            document.getElementById('guessInput').value = '';
+            document.getElementById('messageArea').innerText = '';
+            document.getElementById('guessInput').disabled = false;
+            document.getElementById('guessInput').focus();
+
+            // Remove confetti
+            document.querySelectorAll('.confetti').forEach(e => e.remove());
+        }
+
         async function newGame() {
             if (isLoading) return;
-            isLoading = true;
 
+            // 1. Check Queue
+            if (wordQueue.length > 0) {
+                // Queue has words, use one immediately
+                setGameWord(wordQueue.pop());
+                return;
+            }
+
+            // 2. Queue empty, fetch new batch
+            isLoading = true;
             document.getElementById('wordDisplay').innerText = "Loading...";
             document.getElementById('wordDisplay').style.opacity = "0.5";
 
@@ -290,31 +330,29 @@
             btns.forEach(b => b.disabled = true);
 
             try {
-                // We'll try to get fresh batch of words, or just pick one if we recently fetched?
-                // For simplicity, let's fetch a small batch every time to ensure randomness "from the web"
-                // Start the fetch
-                const candidates = await fetchWords();
+                let candidates = await fetchWords();
 
-                // Pick a random one from candidates
-                const randomIndex = getRandomInt(candidates.length);
-                currentWord = candidates[randomIndex];
-                maskedWord = maskWord(currentWord);
+                if (candidates.length === 0) {
+                    // Use fallback if API fails
+                    candidates = shuffleArray([...fallbackWords]);
+                } else {
+                    // Shuffle the candidates from Wikipedia
+                    candidates = shuffleArray(candidates);
+                }
 
-                document.getElementById('wordDisplay').innerText = maskedWord;
-                document.getElementById('wordDisplay').style.opacity = "1";
-                document.getElementById('guessInput').value = '';
-                document.getElementById('messageArea').innerText = '';
-                document.getElementById('guessInput').disabled = false;
-                document.getElementById('guessInput').focus();
+                // Fill queue
+                wordQueue = candidates;
 
-                // Remove confetti
-                document.querySelectorAll('.confetti').forEach(e => e.remove());
+                if (wordQueue.length > 0) {
+                    setGameWord(wordQueue.pop());
+                } else {
+                    // Should be reachable only if fallback list is empty
+                    setGameWord("ERROR");
+                }
+
             } catch (e) {
-                // Fallback logic handled in fetchWords return, but just in case
-                currentWord = fallbackWords[getRandomInt(fallbackWords.length)];
-                maskedWord = maskWord(currentWord);
-                document.getElementById('wordDisplay').innerText = maskedWord;
-                document.getElementById('wordDisplay').style.opacity = "1";
+                console.error("Critical error in newGame", e);
+                setGameWord(fallbackWords[0]);
             } finally {
                 isLoading = false;
                 btns.forEach(b => b.disabled = false);
@@ -393,6 +431,25 @@
         newGame();
 
     </script>
+
+
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-124730361-2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'UA-124730361-2');
+    </script>
+
+    <script type="text/javascript">
+        (function (c, l, a, r, i, t, y) {
+            c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+            t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+            y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+        })(window, document, "clarity", "script", "dvrksvhehn");
+    </script>
+
 </body>
 
 </html>
