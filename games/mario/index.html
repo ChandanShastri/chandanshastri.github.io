@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Super Simple Mario</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #5c94fc;
+            /* Mario Sky Blue */
+            font-family: 'Press Start 2P', cursive;
+            overflow: hidden;
+            display: flex;
+            justify_content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            touch-action: none;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #5c94fc;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+            /* Crucial for retro look */
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            /* Let clicks pass through to canvas/game */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            color: #fff;
+            text-shadow: 2px 2px #000;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        #start-screen,
+        #game-over-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            text-align: center;
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #ffcc00;
+            text-shadow: 4px 4px #c23e00;
+        }
+
+        p {
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        input {
+            font-family: 'Press Start 2P', cursive;
+            padding: 10px;
+            font-size: 16px;
+            text-align: center;
+            background: #000;
+            color: #fff;
+            border: 2px solid #fff;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        button {
+            font-family: 'Press Start 2P', cursive;
+            padding: 15px 30px;
+            font-size: 16px;
+            background: #e52521;
+            color: #fff;
+            border: none;
+            border-bottom: 4px solid #9c1a16;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        button:active {
+            transform: translateY(4px);
+            border-bottom: none;
+            margin-bottom: 4px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Mobile Controls Hints */
+        #mobile-hint {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 10px;
+            pointer-events: none;
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 24px;
+            }
+
+            p {
+                font-size: 10px;
+            }
+
+            #mobile-hint {
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+
+        <div id="ui-layer">
+            <div class="hud">
+                <div id="score-display">MARIO 000000</div>
+                <div id="high-score-display">HIGH 000000</div>
+                <div id="name-display">PLAYER</div>
+            </div>
+            <div id="mobile-hint">TAP TO JUMP</div>
+        </div>
+
+        <div id="start-screen">
+            <h1>SUPER JS BROS</h1>
+            <p>ENTER YOUR NAME</p>
+            <input type="text" id="player-name-input" maxlength="8" placeholder="PLAYER">
+            <button id="start-button">START GAME</button>
+            <p style="margin-top: 20px; font-size: 10px;">SPACE / TOUCH TO JUMP</p>
+        </div>
+
+        <div id="game-over-screen" class="hidden">
+            <h1>GAME OVER</h1>
+            <p>SCORE: <span id="final-score">0</span></p>
+            <button id="restart-button">TRY AGAIN</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Constants & Config ---
+        const GRAVITY = 0.45;
+        const TERMINAL_VELOCITY = 12;
+        const JUMP_FORCE = -12.5;
+        const MOVE_SPEED = 4;
+        const SCROLL_SPEED = 2; // Initial scroll speed
+
+        // --- State ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let gameState = 'START'; // START, PLAYING, GAMEOVER
+        let frameCount = 0;
+        let score = 0;
+        let highScore = 0;
+        let playerName = 'PLAYER';
+
+        // Game Objects
+        let player = {
+            x: 100,
+            y: 0,
+            width: 32,
+            height: 32,
+            vx: 0,
+            vy: 0,
+            grounded: false,
+            color: '#e52521' // Mario Red
+        };
+
+        let platforms = [];
+        let enemies = [];
+        let particles = [];
+        let clouds = [];
+        let gameSpeed = SCROLL_SPEED;
+        let floorY = 0; // Calculated based on canvas height
+
+        // --- Assets (Procedural for single file) ---
+        // We'll draw pixel art programmatically to keep it single file
+
+        // --- Input Handling ---
+        const keys = {};
+
+        let jumpBuffer = 0;
+        let coyoteTime = 0;
+        const JUMP_BUFFER_FRAMES = 5;
+        const COYOTE_TIME_FRAMES = 5;
+
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.code === 'ArrowUp') {
+                e.preventDefault(); // Prevent scrolling
+                jumpBuffer = JUMP_BUFFER_FRAMES;
+            }
+            if (e.code === 'ArrowRight') keys['Right'] = true;
+            if (e.code === 'ArrowLeft') keys['Left'] = true;
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.code === 'Space' || e.code === 'ArrowUp') {
+                // Variable Jump Height: Cut velocity if released early
+                if (player.vy < -5) {
+                    player.vy = -5;
+                }
+            }
+            if (e.code === 'ArrowRight') keys['Right'] = false;
+            if (e.code === 'ArrowLeft') keys['Left'] = false;
+        });
+
+        // Touch controls
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Prevent scrolling
+            if (gameState === 'START') startGame();
+            else if (gameState === 'GAMEOVER') resetGame();
+            else if (gameState === 'PLAYING') {
+                jumpBuffer = JUMP_BUFFER_FRAMES;
+            }
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            if (player.vy < -5) {
+                player.vy = -5;
+            }
+        });
+
+        // --- Initialization ---
+        function init() {
+            resize();
+            window.addEventListener('resize', resize);
+
+            // Load High Score
+            const savedScore = localStorage.getItem('marioCloneHighScore');
+            const savedName = localStorage.getItem('marioClonePlayerName');
+            if (savedScore) highScore = parseInt(savedScore);
+            if (savedName) playerName = savedName;
+
+            updateUI();
+
+            // Bind Buttons
+            document.getElementById('start-button').addEventListener('click', startGame);
+            document.getElementById('restart-button').addEventListener('click', resetGame);
+
+            requestAnimationFrame(loop);
+        }
+
+        function resize() {
+            // Set canvas to full window size
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            floorY = canvas.height - 64; // Ground height relative to bottom
+
+            // Ensure player doesn't fall through if resized while grounded
+            if (player.y > floorY - player.height) {
+                player.y = floorY - player.height;
+            }
+        }
+
+        function startGame() {
+            const nameInput = document.getElementById('player-name-input');
+            if (nameInput.value.trim() !== '') {
+                playerName = nameInput.value.trim().toUpperCase();
+                localStorage.setItem('marioClonePlayerName', playerName);
+            }
+
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-over-screen').classList.add('hidden');
+            resetGameVars();
+            gameState = 'PLAYING';
+        }
+
+        function resetGame() {
+            document.getElementById('game-over-screen').classList.add('hidden');
+            resetGameVars();
+            gameState = 'PLAYING';
+        }
+
+        function resetGameVars() {
+            score = 0;
+            frameCount = 0;
+            gameSpeed = SCROLL_SPEED;
+
+            player.x = 100;
+            player.y = 100;
+            player.vx = 0;
+            player.vy = 0;
+            player.grounded = false;
+
+            platforms = [];
+            enemies = [];
+            particles = [];
+            clouds = [];
+
+            // Initial Ground
+            // Create very wide ground segments to cover the screen
+            const segments = Math.ceil(canvas.width / 800) + 1;
+            for (let i = 0; i < segments; i++) {
+                platforms.push({
+                    x: i * 800,
+                    y: floorY,
+                    width: 800,
+                    height: 64,
+                    type: 'ground'
+                });
+            }
+
+            // Initial Clouds
+            addCloud(100);
+            addCloud(400);
+            addCloud(700);
+        }
+
+        // --- Core Game Loop ---
+        function loop() {
+            if (gameState === 'PLAYING') {
+                update();
+            }
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        function update() {
+            frameCount++;
+
+            // 1. Difficulty Scaling
+            if (frameCount % 600 === 0) gameSpeed += 0.2;
+
+            // 2. Score
+            if (frameCount % 10 === 0) score++;
+
+            // 3. Player Physics
+            if (keys['Right']) player.vx += 0.5;
+            if (keys['Left']) player.vx -= 0.5;
+
+            // Friction 
+            player.vx *= 0.9;
+
+            // Limits
+            if (player.vx > MOVE_SPEED) player.vx = MOVE_SPEED;
+            if (player.vx < -MOVE_SPEED) player.vx = -MOVE_SPEED;
+
+            // Apply velocities
+            player.x += player.vx;
+            player.y += player.vy;
+            player.vy += GRAVITY;
+            if (player.vy > TERMINAL_VELOCITY) player.vy = TERMINAL_VELOCITY;
+
+            // Keep player in bounds
+            if (player.x < 0) player.x = 0;
+            if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
+
+            // 4. Platform Logic & Collision
+            let wasGrounded = player.grounded;
+            player.grounded = false;
+
+            for (let i = platforms.length - 1; i >= 0; i--) {
+                let p = platforms[i];
+                p.x -= gameSpeed;
+
+                // Collision Detection
+                if (
+                    player.x < p.x + p.width &&
+                    player.x + player.width > p.x &&
+                    player.y + player.height > p.y &&
+                    player.y < p.y + p.height
+                ) {
+                    const overlapY = (player.y + player.height) - p.y;
+                    if (overlapY < 32 && player.vy > 0 && player.y + player.height - player.vy <= p.y + 10) {
+                        player.grounded = true;
+                        player.vy = 0;
+                        player.y = p.y - player.height;
+                    }
+                }
+
+                // Remove off-screen platforms
+                if (p.x + p.width < -100) {
+                    platforms.splice(i, 1);
+                }
+            }
+
+            // Coyote Time Logic
+            if (player.grounded) {
+                coyoteTime = COYOTE_TIME_FRAMES;
+            } else {
+                coyoteTime--;
+            }
+
+            // Jump Buffering Logic
+            if (jumpBuffer > 0) {
+                jumpBuffer--;
+                if (coyoteTime > 0) {
+                    jump();
+                    coyoteTime = 0; // Consumption
+                    jumpBuffer = 0;
+                }
+            }
+
+            // Pit death
+            if (player.y > canvas.height) {
+                die();
+            }
+
+            // 5. Enemy Logic
+            // Spawn Enemies
+            if (frameCount % 180 === 0 && Math.random() > 0.3) {
+                spawnEnemy();
+            }
+
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                let e = enemies[i];
+                e.x -= (gameSpeed + e.vx);
+
+                e.frame = Math.floor(frameCount / 10) % 2;
+
+                if (
+                    player.x < e.x + e.width - 4 &&
+                    player.x + player.width > e.x + 4 &&
+                    player.y < e.y + e.height &&
+                    player.y + player.height > e.y
+                ) {
+                    const hitFromTop = (player.y + player.height) - e.y;
+                    if (hitFromTop < 20 && player.vy > 0) {
+                        createParticles(e.x + e.width / 2, e.y + e.height / 2, '#8B4513');
+                        enemies.splice(i, 1);
+                        player.vy = -6;
+                        score += 100;
+                    } else {
+                        die();
+                    }
+                }
+
+                if (e.x + e.width < -100) {
+                    enemies.splice(i, 1);
+                }
+            }
+
+            // 6. World Generation (Procedural)
+            const lastPlatform = platforms[platforms.length - 1];
+            if (lastPlatform && lastPlatform.x + lastPlatform.width < canvas.width + 200) {
+                generatePlatform(lastPlatform);
+            }
+
+            // Clouds
+            clouds.forEach(c => {
+                c.x -= gameSpeed * 0.5;
+                if (c.x < -100) {
+                    c.x = canvas.width + Math.random() * 200;
+                    c.y = Math.random() * (canvas.height / 2);
+                }
+            });
+
+            // 7. Particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.5;
+                p.life--;
+                if (p.life <= 0) particles.splice(i, 1);
+            }
+
+            updateUI();
+        }
+
+        function jump() {
+            // Logic handled in update loop now regarding checks
+            player.vy = JUMP_FORCE;
+            player.grounded = false;
+        }
+
+        function die() {
+            gameState = 'GAMEOVER';
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('marioCloneHighScore', highScore);
+            }
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('score-display').innerText = 'MARIO ' + score.toString().padStart(6, '0');
+            document.getElementById('high-score-display').innerText = 'HIGH ' + highScore.toString().padStart(6, '0');
+            document.getElementById('game-over-screen').classList.remove('hidden');
+        }
+
+        function generatePlatform(lastP) {
+            const minGap = 80;
+            const maxGap = 160;
+            const gap = minGap + Math.random() * (maxGap - minGap);
+
+            let newX = lastP.x + lastP.width + gap;
+            let newY = floorY;
+
+            if (Math.random() > 0.5) {
+                const heightChange = (Math.random() * 100) - 50;
+                // newY -= heightChange; // Simplified
+            }
+
+            let width = 200 + Math.random() * 600;
+
+            platforms.push({
+                x: newX,
+                y: newY,
+                width: width,
+                height: 64,
+                type: 'ground'
+            });
+
+            if (Math.random() > 0.7) {
+                platforms.push({
+                    x: newX + 50 + Math.random() * (width - 100),
+                    y: newY - 64 * (1 + Math.floor(Math.random() * 2)),
+                    width: 48,
+                    height: 64 * 3,
+                    type: 'block'
+                });
+            }
+        }
+
+        function spawnEnemy() {
+            enemies.push({
+                x: canvas.width + 50,
+                y: floorY - 32,
+                width: 32,
+                height: 32,
+                vx: -1,
+                color: '#8B4513'
+            });
+        }
+
+        function addCloud(x) {
+            clouds.push({
+                x: x || canvas.width + Math.random() * 200,
+                y: Math.random() * (canvas.height / 2),
+                size: 30 + Math.random() * 30
+            });
+        }
+
+        function createParticles(x, y, color) {
+            for (let i = 0; i < 8; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 10,
+                    vy: (Math.random() - 0.5) * 10,
+                    life: 30,
+                    color: color
+                });
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('score-display').innerText = 'MARIO ' + score.toString().padStart(6, '0');
+            document.getElementById('high-score-display').innerText = 'HIGH ' + highScore.toString().padStart(6, '0');
+            document.getElementById('name-display').innerText = playerName;
+        }
+
+        // --- Rendering ---
+        function draw() {
+            // Clear
+            ctx.fillStyle = '#5c94fc';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Clouds
+            ctx.fillStyle = '#FFFFFF';
+            clouds.forEach(c => {
+                ctx.beginPath();
+                ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
+                ctx.arc(c.x + c.size * 0.6, c.y - c.size * 0.4, c.size * 0.8, 0, Math.PI * 2);
+                ctx.arc(c.x + c.size * 1.2, c.y, c.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Draw Platforms
+            platforms.forEach(p => {
+                if (p.type === 'ground') {
+                    ctx.fillStyle = '#c84c0c';
+                    ctx.fillRect(p.x, p.y, p.width, p.height);
+
+                    ctx.fillStyle = '#80d010';
+                    ctx.fillRect(p.x, p.y, p.width, 10);
+
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(p.x, p.y, p.width, p.height);
+                } else {
+                    ctx.fillStyle = '#80d010';
+                    ctx.fillRect(p.x, p.y, p.width, p.height);
+                    ctx.strokeStyle = '#004000';
+                    ctx.lineWidth = 4;
+                    ctx.strokeRect(p.x, p.y, p.width, p.height);
+
+                    ctx.fillStyle = '#80d010';
+                    ctx.fillRect(p.x - 4, p.y, p.width + 8, 30);
+                    ctx.strokeRect(p.x - 4, p.y, p.width + 8, 30);
+                }
+            });
+
+            // Draw Player
+            ctx.fillStyle = player.color;
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            ctx.fillStyle = '#4c4cff';
+            ctx.fillRect(player.x + 4, player.y + 16, 24, 16);
+            ctx.fillStyle = '#f8d878';
+            ctx.fillRect(player.x + 4, player.y + 4, 20, 10);
+            ctx.fillStyle = player.color;
+            ctx.fillRect(player.x, player.y, 32, 6);
+            ctx.fillRect(player.x, player.y, 20, 10);
+
+            // Draw Enemies
+            enemies.forEach(e => {
+                ctx.fillStyle = e.color;
+                let h = e.height;
+                let w = e.width;
+                let y = e.y;
+
+                if (Math.floor(frameCount / 10) % 2 === 0) {
+                    h -= 2; y += 2; w += 2;
+                }
+
+                ctx.beginPath();
+                ctx.arc(e.x + 16, y + 10, 16, Math.PI, 0);
+                ctx.fill();
+                ctx.fillStyle = '#f8d878';
+                ctx.fillRect(e.x + 8, y + 10, 16, 12);
+                ctx.fillStyle = '#000';
+                if (e.frame === 0) {
+                    ctx.fillRect(e.x, y + 22, 10, 10);
+                    ctx.fillRect(e.x + 22, y + 22, 10, 10);
+                } else {
+                    ctx.fillRect(e.x + 4, y + 22, 10, 10);
+                    ctx.fillRect(e.x + 18, y + 22, 10, 10);
+                }
+            });
+
+            // Draw Particles
+            particles.forEach(p => {
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, 5, 5);
+            });
+        }
+
+        // Start
+        init();
+
+    </script>
+
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-124730361-2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'UA-124730361-2');
+    </script>
+
+    <script type="text/javascript">
+        (function (c, l, a, r, i, t, y) {
+            c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+            t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+            y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+        })(window, document, "clarity", "script", "dvrksvhehn");
+    </script>
+
+</body>
+
+</html>
