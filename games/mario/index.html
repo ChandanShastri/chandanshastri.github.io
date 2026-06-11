@@ -281,6 +281,7 @@
         let enemies = [];
         let particles = [];
         let clouds = [];
+        let pipes = [];
         let gameSpeed = SCROLL_SPEED;
         let floorY = 0; // Calculated based on canvas height
 
@@ -398,6 +399,7 @@
             enemies = [];
             particles = [];
             clouds = [];
+            pipes = [];
 
             // Initial Ground
             // Create very wide ground segments to cover the screen
@@ -494,6 +496,17 @@
                 }
             }
 
+            for (let i = pipes.length - 1; i >= 0; i--) {
+                const pipe = pipes[i];
+                pipe.x -= gameSpeed;
+
+                resolveSolidCollision(player, pipe, true);
+
+                if (pipe.x + pipe.width < -100) {
+                    pipes.splice(i, 1);
+                }
+            }
+
             if (player.grounded && !wasGrounded) {
                 createParticles(player.x + player.width / 2, player.y + player.height, '#f5d18c', 10, 5);
             }
@@ -529,6 +542,21 @@
             for (let i = enemies.length - 1; i >= 0; i--) {
                 let e = enemies[i];
                 e.x -= (gameSpeed + e.vx);
+                e.vy += GRAVITY * 0.85;
+                if (e.vy > TERMINAL_VELOCITY) e.vy = TERMINAL_VELOCITY;
+                e.y += e.vy;
+                e.grounded = false;
+
+                for (let j = 0; j < platforms.length; j++) {
+                    const p = platforms[j];
+                    resolveSolidCollision(e, p, false);
+                    if (e.grounded) break;
+                }
+
+                for (let j = 0; j < pipes.length; j++) {
+                    resolveSolidCollision(e, pipes[j], true);
+                    if (e.grounded) break;
+                }
 
                 e.frame = Math.floor(frameCount / 10) % 2;
 
@@ -550,6 +578,11 @@
                 }
 
                 if (e.x + e.width < -100) {
+                    enemies.splice(i, 1);
+                    continue;
+                }
+
+                if (e.y > canvas.height + 120) {
                     enemies.splice(i, 1);
                 }
             }
@@ -640,6 +673,18 @@
                     type: 'block'
                 });
             }
+
+            if (Math.random() > 0.5) {
+                const pipeWidth = 48;
+                const pipeHeight = 64 + Math.floor(Math.random() * 64);
+                pipes.push({
+                    x: newX + width * 0.35,
+                    y: floorY - pipeHeight,
+                    width: pipeWidth,
+                    height: pipeHeight,
+                    type: 'pipe'
+                });
+            }
         }
 
         function spawnEnemy() {
@@ -649,6 +694,8 @@
                 width: 32,
                 height: 32,
                 vx: -1,
+                vy: 0,
+                grounded: false,
                 color: '#8B4513'
             });
         }
@@ -661,17 +708,16 @@
             });
         }
 
-        function createParticles(x, y, color) {
-            const count = arguments[3] ?? 8;
-            const power = arguments[4] ?? 10;
+        function createParticles(x, y, color, count = 8, power = 10, lifeMin = 24, lifeRange = 12) {
             for (let i = 0; i < count; i++) {
+                const life = lifeMin + Math.floor(Math.random() * lifeRange);
                 particles.push({
                     x: x,
                     y: y,
                     vx: (Math.random() - 0.5) * power,
                     vy: (Math.random() - 0.5) * power,
-                    life: 24 + Math.floor(Math.random() * 12),
-                    maxLife: 24 + Math.floor(Math.random() * 12),
+                    life: life,
+                    maxLife: life,
                     gravity: 0.22 + Math.random() * 0.18,
                     color: color,
                     size: 3 + Math.random() * 4,
@@ -704,6 +750,10 @@
             // Draw Platforms
             platforms.forEach(p => {
                 drawPlatform(p);
+            });
+
+            pipes.forEach(pipe => {
+                drawPipe(pipe);
             });
 
             // Draw Player
@@ -841,6 +891,43 @@
                 ctx.fillStyle = 'rgba(255,255,255,0.18)';
                 ctx.fillRect(p.x, p.y, p.width, 4);
             }
+        }
+
+        function drawPipe(pipe) {
+            const lipHeight = 16;
+            const capHeight = 18;
+            const bodyHeight = Math.max(0, pipe.height - capHeight);
+
+            ctx.save();
+            ctx.translate(pipe.x, pipe.y);
+
+            const bodyGradient = ctx.createLinearGradient(0, 0, pipe.width, 0);
+            bodyGradient.addColorStop(0, '#2b8f1f');
+            bodyGradient.addColorStop(0.45, '#57d13e');
+            bodyGradient.addColorStop(1, '#1f6c17');
+
+            ctx.fillStyle = bodyGradient;
+            roundRect(0, capHeight, pipe.width, bodyHeight, 6);
+            ctx.fill();
+
+            const capGradient = ctx.createLinearGradient(0, 0, pipe.width, 0);
+            capGradient.addColorStop(0, '#4fbf34');
+            capGradient.addColorStop(0.5, '#7be35a');
+            capGradient.addColorStop(1, '#3ea92a');
+            ctx.fillStyle = capGradient;
+            roundRect(-8, 0, pipe.width + 16, capHeight, 8);
+            ctx.fill();
+
+            ctx.fillStyle = 'rgba(255,255,255,0.16)';
+            ctx.fillRect(3, capHeight + 2, 4, bodyHeight - 4);
+            ctx.fillRect(pipe.width - 7, capHeight + 2, 3, bodyHeight - 4);
+
+            ctx.strokeStyle = '#0f3d0c';
+            ctx.lineWidth = 3;
+            roundRect(-8, 0, pipe.width + 16, pipe.height, 8);
+            ctx.stroke();
+
+            ctx.restore();
         }
 
         function drawPlayer() {
@@ -982,6 +1069,41 @@
             ctx.arcTo(x, y + height, x, y, r);
             ctx.arcTo(x, y, x + width, y, r);
             ctx.closePath();
+        }
+
+        function resolveSolidCollision(entity, solid, allowSideBlock) {
+            if (
+                entity.x < solid.x + solid.width &&
+                entity.x + entity.width > solid.x &&
+                entity.y < solid.y + solid.height &&
+                entity.y + entity.height > solid.y
+            ) {
+                const prevBottom = entity.y + entity.height - entity.vy;
+                const wasAbove = prevBottom <= solid.y + 10;
+
+                if (entity.vy >= 0 && wasAbove) {
+                    entity.y = solid.y - entity.height;
+                    entity.vy = 0;
+                    entity.grounded = true;
+                    return;
+                }
+
+                if (!allowSideBlock) {
+                    return;
+                }
+
+                const overlapLeft = (entity.x + entity.width) - solid.x;
+                const overlapRight = (solid.x + solid.width) - entity.x;
+                if (overlapLeft < overlapRight) {
+                    entity.x = solid.x - entity.width - 0.01;
+                } else {
+                    entity.x = solid.x + solid.width + 0.01;
+                }
+
+                if (entity.vx !== undefined) {
+                    entity.vx = 0;
+                }
+            }
         }
 
         // Start
