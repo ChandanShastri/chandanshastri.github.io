@@ -66,6 +66,34 @@
             min-height: 4rem;
         }
 
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 0.8rem 0.6rem;
+            font-size: 0.95rem;
+            line-height: 1.3;
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 1.15rem;
+            margin-top: 0.25rem;
+        }
+
+        @media (min-width: 640px) {
+            .stats {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
         .input-group {
             margin-bottom: 2rem;
             position: relative;
@@ -145,6 +173,16 @@
             color: var(--error-color);
         }
 
+        .message.banner {
+            height: auto;
+            min-height: 2.5rem;
+            padding: 0.8rem 1rem;
+            border-radius: 14px;
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -190,6 +228,13 @@
 
         <div class="word-display" id="wordDisplay">_ _ _ _ _</div>
 
+        <div class="stats" aria-live="polite">
+            <div class="stat">Word length<strong id="lengthStat">5</strong></div>
+            <div class="stat">Attempts left<strong id="attemptsStat">0</strong></div>
+            <div class="stat">Score<strong id="scoreStat">100</strong></div>
+            <div class="stat">Words solved<strong id="winsStat">0</strong></div>
+        </div>
+
         <div class="input-group">
             <input type="text" id="guessInput" placeholder="Type your guess here..." autocomplete="off">
         </div>
@@ -197,7 +242,7 @@
         <div class="btn-group">
             <button class="btn-primary" onclick="checkGuess()">Check Guess</button>
             <button class="btn-secondary" onclick="revealWord()">Reveal Code</button>
-            <button class="btn-secondary" onclick="newGame()">New Word</button>
+            <button class="btn-secondary" onclick="newGame(true)">New Word</button>
         </div>
 
         <div class="message" id="messageArea"></div>
@@ -217,21 +262,96 @@
         let maskedWord = "";
         let isLoading = false;
         let wordQueue = []; // Queue to store words from fetched articles
+        let attemptsLeft = 0;
+        let wordsSolved = 0;
+        let score = 100;
+        let revealedHintIndices = new Set();
+        let hiddenIndices = new Set();
+        let nextRoundAttempts = null;
+        let roundEnded = false;
 
         function getRandomInt(max) {
             return Math.floor(Math.random() * max);
         }
 
-        function maskWord(word) {
-            const splitWord = word.split('');
+        function createMaskedIndices(word) {
             const maskCount = Math.floor(word.length * 0.6); // Mask 60% of letters
             const indices = new Set();
+            const protectedIndices = new Set([0, word.length - 1]);
+            const availableIndices = Array.from({ length: word.length }, (_, index) => index)
+                .filter(index => !protectedIndices.has(index));
 
-            while (indices.size < maskCount) {
-                indices.add(getRandomInt(word.length));
+            if (availableIndices.length === 0) {
+                return indices;
             }
 
-            return splitWord.map((char, index) => indices.has(index) ? '_' : char).join(' ');
+            while (indices.size < Math.min(maskCount, availableIndices.length)) {
+                indices.add(availableIndices[getRandomInt(availableIndices.length)]);
+            }
+
+            return indices;
+        }
+
+        function renderWord(word) {
+            return word.split('').map((char, index) => {
+                if (revealedHintIndices.has(index) || !hiddenIndices.has(index)) {
+                    return char;
+                }
+
+                return '_';
+            }).join(' ');
+        }
+
+        function revealHintLetter() {
+            const availableIndices = Array.from(hiddenIndices).filter(index => !revealedHintIndices.has(index));
+
+            if (availableIndices.length === 0) {
+                return null;
+            }
+
+            const chosenIndex = availableIndices[getRandomInt(availableIndices.length)];
+            const hintedLetter = currentWord[chosenIndex];
+
+            currentWord.split('').forEach((letter, index) => {
+                if (letter === hintedLetter) {
+                    revealedHintIndices.add(index);
+                }
+            });
+
+            return hintedLetter;
+        }
+
+        function updateStats() {
+            document.getElementById('lengthStat').innerText = currentWord ? currentWord.length : 0;
+            document.getElementById('attemptsStat').innerText = attemptsLeft;
+            document.getElementById('scoreStat').innerText = score;
+            document.getElementById('winsStat').innerText = wordsSolved;
+        }
+
+        function countSharedLetters(guess, word) {
+            const wordLetters = new Set(word.split(''));
+            const seen = new Set();
+            let matches = 0;
+
+            guess.split('').forEach(letter => {
+                if (wordLetters.has(letter) && !seen.has(letter)) {
+                    seen.add(letter);
+                    matches += 1;
+                }
+            });
+
+            return matches;
+        }
+
+        function endGameAndRestart(message) {
+            revealWord(message);
+            document.getElementById('messageArea').className = 'message banner';
+            roundEnded = true;
+            score = 100;
+            updateStats();
+            setTimeout(() => {
+                newGame();
+            }, 1400);
         }
 
         // Fisher-Yates shuffle
@@ -297,20 +417,28 @@
 
         function setGameWord(word) {
             currentWord = word;
-            maskedWord = maskWord(currentWord);
+            hiddenIndices = createMaskedIndices(currentWord);
+            revealedHintIndices = new Set();
+            attemptsLeft = nextRoundAttempts !== null ? nextRoundAttempts : Math.max(1, hiddenIndices.size - 1);
+            nextRoundAttempts = null;
+            roundEnded = false;
+            maskedWord = renderWord(currentWord);
 
             document.getElementById('wordDisplay').innerText = maskedWord;
             document.getElementById('wordDisplay').style.opacity = "1";
             document.getElementById('guessInput').value = '';
-            document.getElementById('messageArea').innerText = '';
+            document.getElementById('messageArea').innerText = `You have ${attemptsLeft} attempts. Guess a ${currentWord.length}-letter word.`;
+            document.getElementById('messageArea').className = 'message';
             document.getElementById('guessInput').disabled = false;
             document.getElementById('guessInput').focus();
+
+            updateStats();
 
             // Remove confetti
             document.querySelectorAll('.confetti').forEach(e => e.remove());
         }
 
-        async function newGame() {
+        async function startNextWord() {
             if (isLoading) return;
 
             // 1. Check Queue
@@ -359,10 +487,38 @@
             }
         }
 
-        function revealWord() {
+        async function newGame(skipPenalty = false) {
+            if (isLoading) return;
+
+            if (skipPenalty && currentWord && !roundEnded) {
+                score = Math.max(0, score - 10);
+                updateStats();
+                document.getElementById('messageArea').innerText = "Word skipped. -10 points. Starting a new word...";
+                document.getElementById('messageArea').className = 'message banner';
+                roundEnded = true;
+
+                if (score === 0) {
+                    endGameAndRestart(`Game over. Score hit zero. Restarting with a fresh round.`);
+                    return;
+                }
+
+                isLoading = true;
+
+                setTimeout(() => {
+                    isLoading = false;
+                    startNextWord();
+                }, 700);
+
+                return;
+            }
+
+            return startNextWord();
+        }
+
+        function revealWord(message) {
             document.getElementById('wordDisplay').innerText = currentWord.split('').join(' ');
             document.getElementById('messageArea').className = 'message';
-            document.getElementById('messageArea').innerText = "The word was " + currentWord;
+            document.getElementById('messageArea').innerText = message || ("The word was " + currentWord);
             document.getElementById('guessInput').disabled = true;
         }
 
@@ -381,10 +537,42 @@
                 messageArea.className = 'message success';
                 document.getElementById('wordDisplay').innerText = currentWord.split('').join(' ');
                 document.getElementById('guessInput').disabled = true;
+                wordsSolved += 1;
+                nextRoundAttempts = 3;
+                roundEnded = true;
+                updateStats();
                 celebrate();
             } else {
-                messageArea.innerText = "Wrong! Try again.";
-                messageArea.className = 'message error';
+                attemptsLeft -= 1;
+                score -= 20;
+                const hintedLetter = revealHintLetter();
+                const sharedLetters = countSharedLetters(userGuess, currentWord);
+                maskedWord = renderWord(currentWord);
+                document.getElementById('wordDisplay').innerText = maskedWord;
+
+                if (score <= 0) {
+                    endGameAndRestart(`Game over. Score reached ${score}. Restarting with a fresh round.`);
+                    return;
+                }
+
+                if (attemptsLeft > 0) {
+                    const hintText = hintedLetter ? `Hint letter revealed: ${hintedLetter}. ` : '';
+                    messageArea.innerText = `${hintText}${sharedLetters > 0
+                        ? `Wrong! ${sharedLetters} letter${sharedLetters === 1 ? '' : 's'} match.`
+                        : 'Wrong! No letters match.'} ${attemptsLeft} attempt${attemptsLeft === 1 ? '' : 's'} left. Score: ${score}.`;
+                    messageArea.className = 'message error';
+                } else {
+                    revealWord(`Out of attempts. The word was ${currentWord}. Final score: ${score}.`);
+                    messageArea.className = 'message banner';
+                    score = 100;
+                    roundEnded = true;
+                    updateStats();
+                    setTimeout(() => {
+                        newGame();
+                    }, 1400);
+                }
+
+                updateStats();
 
                 // Shake effect
                 const container = document.querySelector('.container');
