@@ -11,12 +11,13 @@
         body {
             margin: 0;
             padding: 0;
-            background-color: #5c94fc;
-            /* Mario Sky Blue */
+            background:
+                radial-gradient(circle at top, rgba(255, 255, 255, 0.2), transparent 38%),
+                linear-gradient(180deg, #8fc9ff 0%, #5c94fc 45%, #3a6fe0 100%);
             font-family: 'Press Start 2P', cursive;
             overflow: hidden;
             display: flex;
-            justify_content: center;
+            justify-content: center;
             align-items: center;
             height: 100vh;
             width: 100vw;
@@ -27,8 +28,21 @@
             position: relative;
             width: 100%;
             height: 100%;
-            background: #5c94fc;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0));
             overflow: hidden;
+            box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.14), 0 25px 60px rgba(0, 0, 0, 0.25);
+        }
+
+        #game-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.08), transparent 20%),
+                radial-gradient(circle at 80% 15%, rgba(255, 255, 255, 0.08), transparent 18%),
+                linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0.08));
+            mix-blend-mode: screen;
         }
 
         canvas {
@@ -46,21 +60,26 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            /* Let clicks pass through to canvas/game */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             padding: 20px;
             box-sizing: border-box;
+            z-index: 3;
         }
 
         .hud {
             display: flex;
             justify-content: space-between;
             color: #fff;
-            text-shadow: 2px 2px #000;
+            text-shadow: 0 2px 0 rgba(0, 0, 0, 0.55), 0 0 12px rgba(0, 0, 0, 0.22);
             font-size: 16px;
             width: 100%;
+            padding: 10px 14px;
+            border-radius: 16px;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.08));
+            backdrop-filter: blur(4px);
+            box-sizing: border-box;
         }
 
         #start-screen,
@@ -79,19 +98,23 @@
             text-align: center;
             pointer-events: auto;
             z-index: 10;
+            backdrop-filter: blur(8px);
+            animation: fadeIn 0.25s ease-out;
         }
 
         h1 {
             font-size: 32px;
             margin-bottom: 20px;
             color: #ffcc00;
-            text-shadow: 4px 4px #c23e00;
+            text-shadow: 4px 4px #c23e00, 0 0 20px rgba(255, 204, 0, 0.2);
+            letter-spacing: 2px;
         }
 
         p {
             font-size: 14px;
             line-height: 1.5;
             margin-bottom: 20px;
+            max-width: 80vw;
         }
 
         input {
@@ -104,6 +127,7 @@
             border: 2px solid #fff;
             margin-bottom: 20px;
             text-transform: uppercase;
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.2);
         }
 
         button {
@@ -115,13 +139,21 @@
             border: none;
             border-bottom: 4px solid #9c1a16;
             cursor: pointer;
-            transition: transform 0.1s;
+            transition: transform 0.12s ease, filter 0.12s ease, box-shadow 0.12s ease;
+            box-shadow: 0 10px 0 rgba(156, 26, 22, 0.35), 0 14px 28px rgba(0, 0, 0, 0.18);
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px);
         }
 
         button:active {
             transform: translateY(4px);
             border-bottom: none;
             margin-bottom: 4px;
+            box-shadow: 0 4px 0 rgba(156, 26, 22, 0.35), 0 8px 18px rgba(0, 0, 0, 0.16);
         }
 
         .hidden {
@@ -138,6 +170,7 @@
             font-size: 10px;
             pointer-events: none;
             display: none;
+            animation: pulse 1.8s ease-in-out infinite;
         }
 
         @media (max-width: 600px) {
@@ -151,6 +184,31 @@
 
             #mobile-hint {
                 display: block;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 0.35;
+                transform: translateY(0);
+            }
+
+            50% {
+                opacity: 0.75;
+                transform: translateY(-3px);
             }
         }
     </style>
@@ -202,6 +260,8 @@
         let score = 0;
         let highScore = 0;
         let playerName = 'PLAYER';
+        let time = 0;
+        let screenShake = 0;
 
         // Game Objects
         let player = {
@@ -212,6 +272,8 @@
             vx: 0,
             vy: 0,
             grounded: false,
+            facing: 1,
+            walkCycle: 0,
             color: '#e52521' // Mario Red
         };
 
@@ -367,6 +429,12 @@
 
         function update() {
             frameCount++;
+            time += 1;
+
+            if (screenShake > 0) {
+                screenShake *= 0.85;
+                if (screenShake < 0.25) screenShake = 0;
+            }
 
             // 1. Difficulty Scaling
             if (frameCount % 600 === 0) gameSpeed += 0.2;
@@ -377,6 +445,8 @@
             // 3. Player Physics
             if (keys['Right']) player.vx += 0.5;
             if (keys['Left']) player.vx -= 0.5;
+            if (keys['Right']) player.facing = 1;
+            if (keys['Left']) player.facing = -1;
 
             // Friction 
             player.vx *= 0.9;
@@ -424,6 +494,10 @@
                 }
             }
 
+            if (player.grounded && !wasGrounded) {
+                createParticles(player.x + player.width / 2, player.y + player.height, '#f5d18c', 10, 5);
+            }
+
             // Coyote Time Logic
             if (player.grounded) {
                 coyoteTime = COYOTE_TIME_FRAMES;
@@ -466,7 +540,7 @@
                 ) {
                     const hitFromTop = (player.y + player.height) - e.y;
                     if (hitFromTop < 20 && player.vy > 0) {
-                        createParticles(e.x + e.width / 2, e.y + e.height / 2, '#8B4513');
+                        createParticles(e.x + e.width / 2, e.y + e.height / 2, '#8B4513', 12, 8);
                         enemies.splice(i, 1);
                         player.vy = -6;
                         score += 100;
@@ -500,9 +574,16 @@
                 let p = particles[i];
                 p.x += p.vx;
                 p.y += p.vy;
-                p.vy += 0.5;
+                p.vy += p.gravity;
                 p.life--;
+                p.alpha = Math.max(0, p.life / p.maxLife);
                 if (p.life <= 0) particles.splice(i, 1);
+            }
+
+            if (player.grounded && (Math.abs(player.vx) > 0.2)) {
+                player.walkCycle += 0.18 + Math.min(0.25, Math.abs(player.vx) * 0.03);
+            } else {
+                player.walkCycle += 0.05;
             }
 
             updateUI();
@@ -516,6 +597,7 @@
 
         function die() {
             gameState = 'GAMEOVER';
+            screenShake = 12;
             if (score > highScore) {
                 highScore = score;
                 localStorage.setItem('marioCloneHighScore', highScore);
@@ -580,14 +662,20 @@
         }
 
         function createParticles(x, y, color) {
-            for (let i = 0; i < 8; i++) {
+            const count = arguments[3] ?? 8;
+            const power = arguments[4] ?? 10;
+            for (let i = 0; i < count; i++) {
                 particles.push({
                     x: x,
                     y: y,
-                    vx: (Math.random() - 0.5) * 10,
-                    vy: (Math.random() - 0.5) * 10,
-                    life: 30,
-                    color: color
+                    vx: (Math.random() - 0.5) * power,
+                    vy: (Math.random() - 0.5) * power,
+                    life: 24 + Math.floor(Math.random() * 12),
+                    maxLife: 24 + Math.floor(Math.random() * 12),
+                    gravity: 0.22 + Math.random() * 0.18,
+                    color: color,
+                    size: 3 + Math.random() * 4,
+                    alpha: 1
                 });
             }
         }
@@ -600,87 +688,300 @@
 
         // --- Rendering ---
         function draw() {
-            // Clear
-            ctx.fillStyle = '#5c94fc';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const shakeX = screenShake ? (Math.random() - 0.5) * screenShake : 0;
+            const shakeY = screenShake ? (Math.random() - 0.5) * screenShake : 0;
+
+            ctx.save();
+            ctx.translate(shakeX, shakeY);
+
+            drawBackground();
 
             // Draw Clouds
-            ctx.fillStyle = '#FFFFFF';
             clouds.forEach(c => {
-                ctx.beginPath();
-                ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
-                ctx.arc(c.x + c.size * 0.6, c.y - c.size * 0.4, c.size * 0.8, 0, Math.PI * 2);
-                ctx.arc(c.x + c.size * 1.2, c.y, c.size, 0, Math.PI * 2);
-                ctx.fill();
+                drawCloud(c);
             });
 
             // Draw Platforms
             platforms.forEach(p => {
-                if (p.type === 'ground') {
-                    ctx.fillStyle = '#c84c0c';
-                    ctx.fillRect(p.x, p.y, p.width, p.height);
-
-                    ctx.fillStyle = '#80d010';
-                    ctx.fillRect(p.x, p.y, p.width, 10);
-
-                    ctx.strokeStyle = '#000';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(p.x, p.y, p.width, p.height);
-                } else {
-                    ctx.fillStyle = '#80d010';
-                    ctx.fillRect(p.x, p.y, p.width, p.height);
-                    ctx.strokeStyle = '#004000';
-                    ctx.lineWidth = 4;
-                    ctx.strokeRect(p.x, p.y, p.width, p.height);
-
-                    ctx.fillStyle = '#80d010';
-                    ctx.fillRect(p.x - 4, p.y, p.width + 8, 30);
-                    ctx.strokeRect(p.x - 4, p.y, p.width + 8, 30);
-                }
+                drawPlatform(p);
             });
 
             // Draw Player
-            ctx.fillStyle = player.color;
-            ctx.fillRect(player.x, player.y, player.width, player.height);
-            ctx.fillStyle = '#4c4cff';
-            ctx.fillRect(player.x + 4, player.y + 16, 24, 16);
-            ctx.fillStyle = '#f8d878';
-            ctx.fillRect(player.x + 4, player.y + 4, 20, 10);
-            ctx.fillStyle = player.color;
-            ctx.fillRect(player.x, player.y, 32, 6);
-            ctx.fillRect(player.x, player.y, 20, 10);
+            drawPlayer();
 
             // Draw Enemies
             enemies.forEach(e => {
-                ctx.fillStyle = e.color;
-                let h = e.height;
-                let w = e.width;
-                let y = e.y;
-
-                if (Math.floor(frameCount / 10) % 2 === 0) {
-                    h -= 2; y += 2; w += 2;
-                }
-
-                ctx.beginPath();
-                ctx.arc(e.x + 16, y + 10, 16, Math.PI, 0);
-                ctx.fill();
-                ctx.fillStyle = '#f8d878';
-                ctx.fillRect(e.x + 8, y + 10, 16, 12);
-                ctx.fillStyle = '#000';
-                if (e.frame === 0) {
-                    ctx.fillRect(e.x, y + 22, 10, 10);
-                    ctx.fillRect(e.x + 22, y + 22, 10, 10);
-                } else {
-                    ctx.fillRect(e.x + 4, y + 22, 10, 10);
-                    ctx.fillRect(e.x + 18, y + 22, 10, 10);
-                }
+                drawEnemy(e);
             });
 
             // Draw Particles
             particles.forEach(p => {
+                ctx.globalAlpha = p.alpha;
                 ctx.fillStyle = p.color;
-                ctx.fillRect(p.x, p.y, 5, 5);
+                ctx.fillRect(p.x, p.y, p.size, p.size);
             });
+
+            ctx.globalAlpha = 1;
+            ctx.restore();
+        }
+
+        function drawBackground() {
+            const sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            sky.addColorStop(0, '#a9dcff');
+            sky.addColorStop(0.45, '#68a9ff');
+            sky.addColorStop(1, '#4e84e6');
+            ctx.fillStyle = sky;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const sun = ctx.createRadialGradient(canvas.width * 0.78, canvas.height * 0.18, 10, canvas.width * 0.78, canvas.height * 0.18, 120);
+            sun.addColorStop(0, 'rgba(255, 245, 178, 0.95)');
+            sun.addColorStop(1, 'rgba(255, 245, 178, 0)');
+            ctx.fillStyle = sun;
+            ctx.beginPath();
+            ctx.arc(canvas.width * 0.78, canvas.height * 0.18, 120, 0, Math.PI * 2);
+            ctx.fill();
+
+            drawMountainLayer(0.15, '#74a65a', 0.28, 0.45);
+            drawMountainLayer(0.28, '#5b8f47', 0.38, 0.65);
+            drawHorizonHills();
+
+            const cloudLayer = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            cloudLayer.addColorStop(0, 'rgba(255,255,255,0.85)');
+            cloudLayer.addColorStop(1, 'rgba(255,255,255,0.9)');
+            ctx.fillStyle = cloudLayer;
+
+            const groundGlow = ctx.createLinearGradient(0, floorY - 40, 0, canvas.height);
+            groundGlow.addColorStop(0, 'rgba(255, 255, 255, 0)');
+            groundGlow.addColorStop(1, 'rgba(54, 96, 32, 0.18)');
+            ctx.fillStyle = groundGlow;
+            ctx.fillRect(0, floorY - 40, canvas.width, canvas.height - floorY + 40);
+
+            ctx.fillStyle = 'rgba(255,255,255,0.16)';
+            for (let i = 0; i < 8; i++) {
+                const x = (i * 180 + ((time * 0.12) % 180)) - 80;
+                const y = 40 + (i % 3) * 26;
+                ctx.beginPath();
+                ctx.arc(x, y, 2.2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function drawMountainLayer(speed, color, heightScale, widthScale) {
+            const offset = -((gameSpeed * speed * frameCount) % (canvas.width * widthScale));
+            ctx.fillStyle = color;
+            for (let x = offset - canvas.width; x < canvas.width + canvas.width; x += canvas.width * widthScale) {
+                ctx.beginPath();
+                ctx.moveTo(x, canvas.height * 0.78);
+                ctx.lineTo(x + canvas.width * 0.18, canvas.height * (0.78 - heightScale));
+                ctx.lineTo(x + canvas.width * 0.36, canvas.height * 0.78);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+        function drawHorizonHills() {
+            const baseY = floorY - 6;
+            ctx.fillStyle = '#69b04f';
+            const offset = -(gameSpeed * 0.35 * frameCount) % 220;
+            for (let x = offset - 220; x < canvas.width + 220; x += 220) {
+                ctx.beginPath();
+                ctx.ellipse(x + 100, baseY + 20, 100, 26, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function drawCloud(c) {
+            const bob = Math.sin((time * 0.02) + c.x * 0.01) * 2;
+            const alpha = 0.78 + Math.sin(time * 0.01 + c.y * 0.02) * 0.08;
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = '#fff';
+            ctx.translate(c.x, c.y + bob);
+            ctx.beginPath();
+            ctx.ellipse(0, 0, c.size * 0.75, c.size * 0.45, 0, 0, Math.PI * 2);
+            ctx.ellipse(c.size * 0.55, -c.size * 0.18, c.size * 0.55, c.size * 0.38, 0, 0, Math.PI * 2);
+            ctx.ellipse(c.size * 1.05, 0, c.size * 0.72, c.size * 0.45, 0, 0, Math.PI * 2);
+            ctx.ellipse(c.size * 0.5, c.size * 0.12, c.size * 1.05, c.size * 0.33, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawPlatform(p) {
+            if (p.type === 'ground') {
+                const grain = ctx.createLinearGradient(p.x, p.y, p.x, p.y + p.height);
+                grain.addColorStop(0, '#d66a1d');
+                grain.addColorStop(0.3, '#c84c0c');
+                grain.addColorStop(1, '#8e2f06');
+                ctx.fillStyle = grain;
+                ctx.fillRect(p.x, p.y, p.width, p.height);
+
+                ctx.fillStyle = '#87d640';
+                ctx.fillRect(p.x, p.y, p.width, 11);
+
+                ctx.fillStyle = 'rgba(255,255,255,0.22)';
+                ctx.fillRect(p.x, p.y + 11, p.width, 3);
+
+                ctx.fillStyle = 'rgba(0,0,0,0.16)';
+                for (let gx = p.x + 10; gx < p.x + p.width; gx += 20) {
+                    ctx.fillRect(gx, p.y + 18, 4, 4);
+                }
+
+                ctx.strokeStyle = '#2c1803';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(p.x, p.y, p.width, p.height);
+            } else {
+                ctx.fillStyle = '#76c83f';
+                ctx.fillRect(p.x, p.y, p.width, p.height);
+                ctx.fillStyle = '#48a91d';
+                ctx.fillRect(p.x - 4, p.y, p.width + 8, 28);
+                ctx.strokeStyle = '#1a5a08';
+                ctx.lineWidth = 4;
+                ctx.strokeRect(p.x - 4, p.y, p.width + 8, 28);
+
+                ctx.fillStyle = 'rgba(255,255,255,0.18)';
+                ctx.fillRect(p.x, p.y, p.width, 4);
+            }
+        }
+
+        function drawPlayer() {
+            const walk = Math.sin(player.walkCycle);
+            const bob = player.grounded ? Math.abs(Math.sin(player.walkCycle * 1.6)) * 1.5 : 0;
+            const lean = player.vx * 2.2;
+            const tilt = player.grounded ? Math.max(-10, Math.min(10, lean)) : Math.max(-14, Math.min(14, player.vy * 0.8));
+
+            ctx.save();
+            ctx.translate(player.x + player.width / 2, player.y + player.height / 2 + bob);
+            ctx.scale(player.facing, 1);
+            ctx.rotate((tilt * Math.PI) / 180);
+            ctx.translate(-player.width / 2, -player.height / 2);
+
+            ctx.globalAlpha = 0.22;
+            ctx.fillStyle = '#2f450d';
+            ctx.beginPath();
+            ctx.ellipse(16, 33, 13, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.globalAlpha = 1;
+            drawLimb(8, 20, 7, 12, '#582911', walk * 7, true);
+            drawLimb(21, 20, 7, 12, '#582911', -walk * 7, true);
+            drawLimb(10, 28, 9, 14, '#2e67d1', -walk * 7, false);
+            drawLimb(18, 28, 9, 14, '#2e67d1', walk * 7, false);
+
+            // Torso
+            ctx.fillStyle = '#254aa5';
+            roundRect(8, 13, 16, 16, 4);
+            ctx.fill();
+            ctx.fillStyle = '#f1c27d';
+            roundRect(9, 11, 14, 8, 4);
+            ctx.fill();
+
+            // Overalls straps
+            ctx.fillStyle = '#1d3990';
+            ctx.fillRect(10, 13, 3, 11);
+            ctx.fillRect(19, 13, 3, 11);
+            ctx.fillStyle = '#f5d27d';
+            ctx.fillRect(11, 18, 2, 2);
+            ctx.fillRect(20, 18, 2, 2);
+
+            // Head
+            ctx.fillStyle = '#f4c48f';
+            ctx.beginPath();
+            ctx.ellipse(16, 10, 8, 7, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Hat
+            ctx.fillStyle = '#e52521';
+            roundRect(8, 2, 16, 7, 3);
+            ctx.fill();
+            ctx.fillRect(6, 7, 20, 3);
+            ctx.fillStyle = '#c71613';
+            ctx.fillRect(8, 8, 16, 1);
+
+            // Face and features
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.ellipse(13.5, 9.5, 1.6, 2.2, 0, 0, Math.PI * 2);
+            ctx.ellipse(18.5, 9.5, 1.6, 2.2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#222';
+            ctx.beginPath();
+            ctx.ellipse(14.2, 10.2, 0.6, 0.9, 0, 0, Math.PI * 2);
+            ctx.ellipse(19.2, 10.2, 0.6, 0.9, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#d28f6d';
+            roundRect(12.2, 12.5, 7.4, 2.6, 1.2);
+            ctx.fill();
+
+            // Gloves and boots
+            ctx.fillStyle = '#fff3df';
+            roundRect(5, 18 + walk * 0.3, 6, 6, 2);
+            roundRect(21, 18 - walk * 0.3, 6, 6, 2);
+            ctx.fill();
+            ctx.fillStyle = '#582911';
+            roundRect(8 + walk * 0.2, 30, 8, 4, 2);
+            roundRect(16 - walk * 0.2, 30, 8, 4, 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawLimb(x, y, width, height, color, swing, isArm) {
+            ctx.save();
+            ctx.translate(x + width / 2, y + height / 2);
+            ctx.rotate((swing * Math.PI) / 180);
+            ctx.translate(-width / 2, -height / 2);
+            ctx.fillStyle = color;
+            if (isArm) {
+                roundRect(0, 0, width, height, 3);
+            } else {
+                roundRect(0, 0, width, height, 2);
+            }
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawEnemy(e) {
+            const bob = Math.sin((frameCount + e.x) * 0.1) * 1.6;
+            ctx.save();
+            ctx.translate(e.x, e.y + bob);
+
+            ctx.fillStyle = '#5a2d0c';
+            ctx.beginPath();
+            ctx.ellipse(16, 18, 15, 12, 0, Math.PI, 0);
+            ctx.fill();
+
+            ctx.fillStyle = '#8f4a1b';
+            roundRect(2, 14, 28, 14, 7);
+            ctx.fill();
+
+            ctx.fillStyle = '#f0d9a8';
+            roundRect(8, 16, 16, 8, 4);
+            ctx.fill();
+
+            ctx.fillStyle = '#000';
+            if (e.frame === 0) {
+                ctx.fillRect(7, 18, 3, 5);
+                ctx.fillRect(21, 18, 3, 5);
+            } else {
+                ctx.fillRect(8, 19, 3, 5);
+                ctx.fillRect(20, 19, 3, 5);
+            }
+
+            ctx.fillStyle = '#2f1c09';
+            ctx.fillRect(4, 28, 8, 5);
+            ctx.fillRect(20, 28, 8, 5);
+            ctx.restore();
+        }
+
+        function roundRect(x, y, width, height, radius) {
+            const r = Math.min(radius, width / 2, height / 2);
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.arcTo(x + width, y, x + width, y + height, r);
+            ctx.arcTo(x + width, y + height, x, y + height, r);
+            ctx.arcTo(x, y + height, x, y, r);
+            ctx.arcTo(x, y, x + width, y, r);
+            ctx.closePath();
         }
 
         // Start
