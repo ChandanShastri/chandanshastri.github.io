@@ -183,6 +183,39 @@
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
         }
 
+        .game-over-banner {
+            display: none;
+            margin-top: 1.25rem;
+            padding: 1rem;
+            border-radius: 18px;
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.96));
+            border: 1px solid rgba(56, 189, 248, 0.22);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.28);
+            text-align: left;
+            gap: 0.85rem;
+        }
+
+        .game-over-banner.visible {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-over-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--accent-color);
+        }
+
+        .game-over-summary {
+            line-height: 1.6;
+            color: rgba(248, 250, 252, 0.92);
+        }
+
+        .restart-button {
+            width: 100%;
+            justify-content: center;
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -232,6 +265,7 @@
             <div class="stat">Word length<strong id="lengthStat">5</strong></div>
             <div class="stat">Attempts left<strong id="attemptsStat">0</strong></div>
             <div class="stat">Score<strong id="scoreStat">100</strong></div>
+            <div class="stat">High score<strong id="highScoreStat">0</strong></div>
             <div class="stat">Words solved<strong id="winsStat">0</strong></div>
         </div>
 
@@ -246,6 +280,12 @@
         </div>
 
         <div class="message" id="messageArea"></div>
+
+        <div class="game-over-banner" id="gameOverBanner" aria-live="polite">
+            <div class="game-over-title">Game Over</div>
+            <div class="game-over-summary" id="gameOverSummary"></div>
+            <button class="btn-primary restart-button" onclick="restartGame()">Restart Game</button>
+        </div>
     </div>
 
     <script>
@@ -265,6 +305,7 @@
         let attemptsLeft = 0;
         let wordsSolved = 0;
         let score = 100;
+        let highScore = Number(localStorage.getItem('wordGuessHighScore') || 0);
         let revealedHintIndices = new Set();
         let hiddenIndices = new Set();
         let nextRoundAttempts = null;
@@ -322,9 +363,15 @@
         }
 
         function updateStats() {
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('wordGuessHighScore', String(highScore));
+            }
+
             document.getElementById('lengthStat').innerText = currentWord ? currentWord.length : 0;
             document.getElementById('attemptsStat').innerText = attemptsLeft;
             document.getElementById('scoreStat').innerText = score;
+            document.getElementById('highScoreStat').innerText = highScore;
             document.getElementById('winsStat').innerText = wordsSolved;
         }
 
@@ -344,14 +391,43 @@
         }
 
         function endGameAndRestart(message) {
+            roundEnded = true;
+            document.getElementById('guessInput').disabled = true;
+            document.querySelector('.btn-primary').disabled = true;
+            document.querySelector('.btn-group button[onclick="revealWord()"]').disabled = true;
+            document.querySelector('.btn-group button[onclick="newGame(true)"]').disabled = true;
+
             revealWord(message);
             document.getElementById('messageArea').className = 'message banner';
-            roundEnded = true;
-            score = 100;
             updateStats();
-            setTimeout(() => {
-                newGame();
-            }, 1400);
+            document.getElementById('gameOverSummary').innerHTML = `Total score: <strong>${Math.max(0, score)}</strong><br>Words solved: <strong>${wordsSolved}</strong><br>High score: <strong>${highScore}</strong>`;
+            document.getElementById('gameOverBanner').classList.add('visible');
+            localStorage.setItem('wordGuessHighScore', String(Math.max(highScore, score)));
+        }
+
+        function restartGame() {
+            score = 100;
+            wordsSolved = 0;
+            attemptsLeft = 0;
+            nextRoundAttempts = null;
+            roundEnded = false;
+            currentWord = "";
+            maskedWord = "";
+            wordQueue = [];
+            hiddenIndices = new Set();
+            revealedHintIndices = new Set();
+
+            document.getElementById('gameOverBanner').classList.remove('visible');
+            document.getElementById('gameOverSummary').innerHTML = '';
+            document.getElementById('messageArea').className = 'message';
+            document.getElementById('messageArea').innerText = '';
+            document.getElementById('guessInput').disabled = false;
+            document.querySelector('.btn-primary').disabled = false;
+            document.querySelector('.btn-group button[onclick="revealWord()"]').disabled = false;
+            document.querySelector('.btn-group button[onclick="newGame(true)"]').disabled = false;
+
+            updateStats();
+            startNextWord();
         }
 
         // Fisher-Yates shuffle
@@ -434,6 +510,7 @@
             document.getElementById('messageArea').innerText = `You have ${attemptsLeft} attempts. Guess a ${currentWord.length}-letter word.`;
             document.getElementById('messageArea').className = 'message';
             document.getElementById('guessInput').disabled = false;
+            document.querySelector('.btn-primary').disabled = false;
             document.getElementById('guessInput').focus();
 
             updateStats();
@@ -502,7 +579,7 @@
                 roundEnded = true;
 
                 if (score === 0) {
-                    endGameAndRestart(`Game over. Score hit zero. Restarting with a fresh round.`);
+                    endGameAndRestart(`Game over. Score hit zero.`);
                     return;
                 }
 
@@ -537,10 +614,12 @@
             }
 
             if (userGuess === currentWord) {
+                score += 20;
                 messageArea.innerText = "Correct! You win!";
                 messageArea.className = 'message success';
                 document.getElementById('wordDisplay').innerText = currentWord.split('').join(' ');
                 document.getElementById('guessInput').disabled = true;
+                document.querySelector('.btn-primary').disabled = true;
                 wordsSolved += 1;
                 nextRoundAttempts = 3;
                 roundEnded = true;
@@ -555,7 +634,7 @@
                 document.getElementById('wordDisplay').innerText = maskedWord;
 
                 if (score <= 0) {
-                    endGameAndRestart(`Game over. Score reached ${score}. Restarting with a fresh round.`);
+                    endGameAndRestart(`Game over. Score reached ${score}.`);
                     return;
                 }
 
@@ -568,7 +647,6 @@
                 } else {
                     revealWord(`Out of attempts. The word was ${currentWord}. Final score: ${score}.`);
                     messageArea.className = 'message banner';
-                    score = 100;
                     roundEnded = true;
                     updateStats();
                     setTimeout(() => {
