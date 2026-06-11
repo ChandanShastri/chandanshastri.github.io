@@ -363,6 +363,10 @@
             return array;
         }
 
+        function sortWordsByLength(words) {
+            return [...words].sort((left, right) => left.length - right.length || left.localeCompare(right));
+        }
+
         async function fetchWords() {
             const titleDisplay = document.querySelector('h1');
             const originalTitle = titleDisplay.innerText;
@@ -444,7 +448,7 @@
             // 1. Check Queue
             if (wordQueue.length > 0) {
                 // Queue has words, use one immediately
-                setGameWord(wordQueue.pop());
+                setGameWord(wordQueue.shift());
                 return;
             }
 
@@ -462,17 +466,17 @@
 
                 if (candidates.length === 0) {
                     // Use fallback if API fails
-                    candidates = shuffleArray([...fallbackWords]);
+                    candidates = sortWordsByLength(fallbackWords);
                 } else {
-                    // Shuffle the candidates from Wikipedia
-                    candidates = shuffleArray(candidates);
+                    // Show shorter words first, then gradually longer words
+                    candidates = sortWordsByLength(candidates);
                 }
 
                 // Fill queue
                 wordQueue = candidates;
 
                 if (wordQueue.length > 0) {
-                    setGameWord(wordQueue.pop());
+                    setGameWord(wordQueue.shift());
                 } else {
                     // Should be reachable only if fallback list is empty
                     setGameWord("ERROR");
