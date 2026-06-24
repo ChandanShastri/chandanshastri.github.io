@@ -300,6 +300,7 @@
 
         let currentWord = "";
         let maskedWord = "";
+        let currentDefinition = "";
         let isLoading = false;
         let wordQueue = []; // Queue to store words from fetched articles
         let attemptsLeft = 0;
@@ -341,6 +342,25 @@
 
                 return '_';
             }).join(' ');
+        }
+
+        function renderWordDisplay(showActualWord = false) {
+            const wordDisplay = document.getElementById('wordDisplay');
+            const hasDefinition = currentDefinition && currentDefinition !== 'Definition not available';
+
+            if (showActualWord) {
+                const definitionMarkup = hasDefinition
+                    ? `<div style="font-size: 1.2rem; margin-bottom: 1rem; color: rgba(248, 250, 252, 0.7);">${currentDefinition}</div>`
+                    : '';
+                wordDisplay.innerHTML = `${definitionMarkup}<div>${currentWord.split('').join(' ')}</div>`;
+                return;
+            }
+
+            if (hasDefinition) {
+                wordDisplay.innerHTML = `<div style="font-size: 1.2rem; margin-bottom: 1rem; color: rgba(248, 250, 252, 0.7);">${currentDefinition}</div><div>${maskedWord}</div>`;
+            } else {
+                wordDisplay.innerText = maskedWord;
+            }
         }
 
         function revealHintLetter() {
@@ -503,8 +523,16 @@
             nextRoundAttempts = null;
             roundEnded = false;
             maskedWord = renderWord(currentWord);
+            currentDefinition = '';
 
-            document.getElementById('wordDisplay').innerText = maskedWord;
+            fetchDefinition(currentWord).then(definition => {
+                currentDefinition = definition || '';
+                renderWordDisplay(false);
+            }).catch(() => {
+                currentDefinition = '';
+                renderWordDisplay(false);
+            });
+
             document.getElementById('wordDisplay').style.opacity = "1";
             document.getElementById('guessInput').value = '';
             document.getElementById('messageArea').innerText = `You have ${attemptsLeft} attempts. Guess a ${currentWord.length}-letter word.`;
@@ -517,6 +545,26 @@
 
             // Remove confetti
             document.querySelectorAll('.confetti').forEach(e => e.remove());
+        }
+
+        async function fetchDefinition(word) {
+            try {
+                const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`);
+                if (!response.ok) {
+                    throw new Error("Definition not found");
+                }
+                const data = await response.json();
+                if (data.length > 0 && data[0].meanings && data[0].meanings.length > 0) {
+                    const definition = data[0].meanings[0].definitions[0].definition;
+                    return definition;
+                }
+                console.log("Definition not found for word:", word);
+                return null;
+            } catch (e) {
+                console.log("Definition not found for word:", word);
+                console.error("Failed to fetch definition", e);
+                return null;
+            }
         }
 
         async function startNextWord() {
@@ -597,7 +645,7 @@
         }
 
         function revealWord(message) {
-            document.getElementById('wordDisplay').innerText = currentWord.split('').join(' ');
+            renderWordDisplay(true);
             document.getElementById('messageArea').className = 'message';
             document.getElementById('messageArea').innerText = message || ("The word was " + currentWord);
             document.getElementById('guessInput').disabled = true;
@@ -617,7 +665,7 @@
                 score += 20;
                 messageArea.innerText = "Correct! You win!";
                 messageArea.className = 'message success';
-                document.getElementById('wordDisplay').innerText = currentWord.split('').join(' ');
+                renderWordDisplay(true);
                 document.getElementById('guessInput').disabled = true;
                 document.querySelector('.btn-primary').disabled = true;
                 wordsSolved += 1;
