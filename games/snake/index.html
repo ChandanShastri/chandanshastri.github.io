@@ -71,6 +71,33 @@
             flex-wrap: wrap;
         }
 
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .player-name-chip {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 8px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            font-size: 1rem;
+            font-weight: 600;
+            color: #f8fafc;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         .score-board {
             display: flex;
             flex-wrap: wrap;
@@ -216,9 +243,12 @@
 
     <div id="game-container">
         <header>
-            <div class="score-board">
-                <div class="score-item">Score: <span id="score">0</span></div>
-                <div class="score-item">Best: <span id="high-score">0</span></div>
+            <div class="top-bar">
+                <div class="player-name-chip" id="player-name-chip">Player: Anonymous</div>
+                <div class="score-board">
+                    <div class="score-item">Score: <span id="score">0</span></div>
+                    <div class="score-item">Best: <span id="high-score">0</span></div>
+                </div>
             </div>
         </header>
 
@@ -247,6 +277,7 @@
         const gameTitle = document.getElementById('game-title');
         const gameMsg = document.getElementById('game-msg');
         const nameInput = document.getElementById('player-name');
+        const playerNameChip = document.getElementById('player-name-chip');
 
         // Game Settings
         const GRID_SIZE = 20;
@@ -277,9 +308,10 @@
         }
 
         function updateHighScoreDisplay() {
-            const name = nameInput.value.trim();
+            const name = nameInput.value.trim() || 'Anonymous';
             highScore = getHighScore(name);
             highScoreEl.innerText = highScore;
+            playerNameChip.innerText = `Player: ${name}`;
         }
 
         nameInput.addEventListener('input', () => {
@@ -348,7 +380,7 @@
             }
 
             gameTitle.innerText = "GAME OVER";
-            gameMsg.innerText = `Score: ${score}`;
+            gameMsg.innerText = `Score: ${score}\nTop Score: ${currentHighScore}`;
             startBtn.innerText = "RETRY";
             uiLayer.classList.remove('hidden');
         }
