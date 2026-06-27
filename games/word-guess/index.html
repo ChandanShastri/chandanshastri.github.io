@@ -216,6 +216,85 @@
             justify-content: center;
         }
 
+        .architecture-panel {
+            margin-top: 1.5rem;
+            padding: 1.15rem;
+            border-radius: 18px;
+            background: rgba(15, 23, 42, 0.72);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: left;
+        }
+
+        .architecture-toggle {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+            border: none;
+            color: var(--accent-color);
+            font: inherit;
+            font-size: 1.05rem;
+            font-weight: 700;
+            padding: 0;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .architecture-toggle span:last-child {
+            font-size: 1rem;
+            color: rgba(248, 250, 252, 0.8);
+            transition: transform 0.2s ease;
+        }
+
+        .architecture-panel.collapsed .architecture-toggle span:last-child {
+            transform: rotate(-90deg);
+        }
+
+        .architecture-panel h2 {
+            margin: 0 0 0.6rem;
+            font-size: 1.05rem;
+            color: var(--accent-color);
+        }
+
+        .architecture-panel p {
+            margin: 0 0 0.75rem;
+            color: rgba(248, 250, 252, 0.8);
+            line-height: 1.55;
+            font-size: 0.95rem;
+        }
+
+        .architecture-diagram {
+            margin: 0 0 0.8rem;
+            padding: 0.9rem;
+            border-radius: 14px;
+            overflow-x: auto;
+            background: rgba(2, 6, 23, 0.7);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            color: #e2e8f0;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+            font-size: 0.82rem;
+            line-height: 1.35;
+            white-space: pre;
+        }
+
+        .architecture-list {
+            margin: 0;
+            padding-left: 1.1rem;
+            color: rgba(248, 250, 252, 0.82);
+            line-height: 1.65;
+            font-size: 0.95rem;
+        }
+
+        .architecture-panel .architecture-content {
+            display: block;
+            margin-top: 0.85rem;
+        }
+
+        .architecture-panel.collapsed .architecture-content {
+            display: none;
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -286,6 +365,60 @@
             <div class="game-over-summary" id="gameOverSummary"></div>
             <button class="btn-primary restart-button" onclick="restartGame()">Restart Game</button>
         </div>
+
+        <section class="architecture-panel collapsed" aria-label="Architecture overview">
+            <button class="architecture-toggle" type="button" onclick="this.parentElement.classList.toggle('collapsed')" aria-expanded="false">
+                <span>Architecture Overview</span>
+                <span>▾</span>
+            </button>
+            <div class="architecture-content">
+                <p>This game is a single-page experience: the HTML provides the screen layout, CSS handles the visual styling, and JavaScript manages the round flow, scoring, hints, and external data.</p>
+                <pre class="architecture-diagram">+---------------------------+
+| Browser UI (DOM / HTML)   |
+| - Word display            |
+| - Stats cards             |
+| - Guess input + buttons   |
++-------------+-------------+
+              |
+              v
++---------------------------+
+| Game Controller (JS)      |
+| - state: currentWord      |
+| - score / attempts        |
+| - round lifecycle         |
+| - hint and win logic      |
++------+------+-------------+
+       |      |
+       |      +----------------------------+
+       |                                   |
+       v                                   v
++---------------------+           +------------------------+
+| Word Source Layer   |           | Persistence Layer     |
+| - Wikipedia API    |           | - localStorage        |
+| - fallback word list|          | - high score          |
++----------+----------+           +------------------------+
+           |
+           v
++---------------------+
+| Definition Layer    |
+| - Dictionary API    |
++---------------------+
+
+Flow:
+1. Start -> fetch words from Wikipedia
+2. Queue words and pick the next one
+3. Mask the word and render UI
+4. Player guesses -> update score / hints / attempts
+5. Win, lose, or skip -> move to next round</pre>
+                <ul class="architecture-list">
+                    <li><strong>UI layer:</strong> the visible page elements such as the masked word, stats, input box, and action buttons.</li>
+                    <li><strong>Controller layer:</strong> the JavaScript functions that manage state, scoring, and game progression.</li>
+                    <li><strong>Word sourcing:</strong> the game fetches candidate words from Wikipedia and falls back to a built-in list if needed.</li>
+                    <li><strong>Definition lookup:</strong> the dictionary API provides a short definition for the current word.</li>
+                    <li><strong>Persistence:</strong> the high score is saved in local storage so it survives refreshes.</li>
+                </ul>
+            </div>
+        </section>
     </div>
 
     <script>
