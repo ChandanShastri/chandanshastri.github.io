@@ -569,28 +569,53 @@
             }
 
             // 6. Enemy Logic
-            // Spawn Enemies
-            if (frameCount % 180 === 0 && Math.random() > 0.3) {
+            const spawnInterval = Math.max(90, 180 - Math.floor(gameSpeed * 10));
+            if (frameCount % spawnInterval === 0 && Math.random() > 0.25) {
                 spawnEnemy();
             }
 
             for (let i = enemies.length - 1; i >= 0; i--) {
                 let e = enemies[i];
-                e.x -= (gameSpeed + e.vx);
-                e.vy += GRAVITY * 0.85;
-                if (e.vy > TERMINAL_VELOCITY) e.vy = TERMINAL_VELOCITY;
-                e.y += e.vy;
-                e.grounded = false;
 
-                for (let j = 0; j < platforms.length; j++) {
-                    const p = platforms[j];
-                    resolveSolidCollision(e, p, false);
-                    if (e.grounded) break;
-                }
+                if (e.type === 'flyer') {
+                    e.x += (e.vx || -1.4);
+                    e.y += Math.sin((frameCount + e.phase) * 0.16) * 1.1;
+                    e.phase += 0.08;
+                    e.attackTimer = (e.attackTimer || 0) + 1;
+                    if (e.attackTimer > 80 && Math.random() > 0.85) {
+                        e.vy = 3.2;
+                        e.attackTimer = 0;
+                    }
+                    e.y += e.vy * 0.35;
+                    e.vy *= 0.92;
+                    if (e.y < floorY - 180) e.y = floorY - 180;
+                    if (e.y > floorY - 48) e.y = floorY - 48;
+                } else {
+                    e.x += e.vx || -1.2;
+                    e.vy += GRAVITY * 0.85;
+                    if (e.vy > TERMINAL_VELOCITY) e.vy = TERMINAL_VELOCITY;
+                    e.y += e.vy;
+                    e.grounded = false;
 
-                for (let j = 0; j < pipes.length; j++) {
-                    resolveSolidCollision(e, pipes[j], true);
-                    if (e.grounded) break;
+                    for (let j = 0; j < platforms.length; j++) {
+                        const p = platforms[j];
+                        resolveSolidCollision(e, p, false);
+                        if (e.grounded) break;
+                    }
+
+                    for (let j = 0; j < pipes.length; j++) {
+                        resolveSolidCollision(e, pipes[j], true);
+                        if (e.grounded) break;
+                    }
+
+                    if (e.type === 'jumper') {
+                        e.jumpCooldown = (e.jumpCooldown || 0) - 1;
+                        if (e.grounded && e.jumpCooldown <= 0) {
+                            e.vy = -8.2 - Math.min(2, gameSpeed * 0.16);
+                            e.grounded = false;
+                            e.jumpCooldown = Math.max(45, 90 - Math.floor(gameSpeed * 8));
+                        }
+                    }
                 }
 
                 e.frame = Math.floor(frameCount / 10) % 2;
@@ -742,15 +767,29 @@
         }
 
         function spawnEnemy() {
+            const progress = Math.min(1, gameSpeed / 4.5);
+            const roll = Math.random();
+            let type = 'walker';
+
+            if (progress > 0.7 && roll > 0.82) {
+                type = 'jumper';
+            } else if (progress > 0.9 && roll > 0.95) {
+                type = 'flyer';
+            }
+
             enemies.push({
                 x: canvas.width + 50,
-                y: floorY - 32,
-                width: 32,
-                height: 32,
-                vx: -1,
+                y: floorY - (type === 'flyer' ? 72 : 32),
+                width: type === 'flyer' ? 34 : 32,
+                height: type === 'flyer' ? 24 : 32,
+                vx: type === 'jumper' ? -1.6 : type === 'flyer' ? -1.4 : -1.2,
                 vy: 0,
                 grounded: false,
-                color: '#8B4513'
+                type: type,
+                color: type === 'jumper' ? '#6b2f0d' : type === 'flyer' ? '#5c4de8' : '#8B4513',
+                phase: Math.random() * Math.PI * 2,
+                jumpCooldown: 40 + Math.random() * 40,
+                attackTimer: 0
             });
         }
 
@@ -1125,35 +1164,75 @@
         }
 
         function drawEnemy(e) {
-            const bob = Math.sin((frameCount + e.x) * 0.1) * 1.6;
+            const bob = Math.sin((frameCount + e.x) * 0.1) * (e.type === 'flyer' ? 3.2 : 1.6);
             ctx.save();
             ctx.translate(e.x, e.y + bob);
 
-            ctx.fillStyle = '#5a2d0c';
-            ctx.beginPath();
-            ctx.ellipse(16, 18, 15, 12, 0, Math.PI, 0);
-            ctx.fill();
+            if (e.type === 'flyer') {
+                ctx.fillStyle = '#4f46e5';
+                ctx.beginPath();
+                ctx.ellipse(16, 12, 12, 8, 0, 0, Math.PI * 2);
+                ctx.fill();
 
-            ctx.fillStyle = '#8f4a1b';
-            roundRect(2, 14, 28, 14, 7);
-            ctx.fill();
+                ctx.fillStyle = '#312e81';
+                ctx.beginPath();
+                ctx.moveTo(6, 10);
+                ctx.lineTo(2, 2);
+                ctx.lineTo(10, 7);
+                ctx.closePath();
+                ctx.fill();
+                ctx.beginPath();
+                ctx.moveTo(26, 10);
+                ctx.lineTo(30, 2);
+                ctx.lineTo(22, 7);
+                ctx.closePath();
+                ctx.fill();
 
-            ctx.fillStyle = '#f0d9a8';
-            roundRect(8, 16, 16, 8, 4);
-            ctx.fill();
-
-            ctx.fillStyle = '#000';
-            if (e.frame === 0) {
-                ctx.fillRect(7, 18, 3, 5);
-                ctx.fillRect(21, 18, 3, 5);
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(10, 10, 2, 3);
+                ctx.fillRect(22, 10, 2, 3);
+                ctx.fillStyle = '#000';
+                ctx.fillRect(10, 10, 1, 2);
+                ctx.fillRect(23, 10, 1, 2);
+            } else if (e.type === 'jumper') {
+                ctx.fillStyle = '#7a2f12';
+                ctx.fillRect(4, 10, 24, 18);
+                ctx.fillStyle = '#b86b2a';
+                ctx.fillRect(8, 12, 16, 10);
+                ctx.fillStyle = '#1f1f1f';
+                ctx.fillRect(9, 16, 3, 4);
+                ctx.fillRect(20, 16, 3, 4);
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(10, 15, 1, 2);
+                ctx.fillRect(21, 15, 1, 2);
             } else {
-                ctx.fillRect(8, 19, 3, 5);
-                ctx.fillRect(20, 19, 3, 5);
+                ctx.fillStyle = '#5a2d0c';
+                ctx.beginPath();
+                ctx.ellipse(16, 18, 15, 12, 0, Math.PI, 0);
+                ctx.fill();
+
+                ctx.fillStyle = '#8f4a1b';
+                roundRect(2, 14, 28, 14, 7);
+                ctx.fill();
+
+                ctx.fillStyle = '#f0d9a8';
+                roundRect(8, 16, 16, 8, 4);
+                ctx.fill();
+
+                ctx.fillStyle = '#000';
+                if (e.frame === 0) {
+                    ctx.fillRect(7, 18, 3, 5);
+                    ctx.fillRect(21, 18, 3, 5);
+                } else {
+                    ctx.fillRect(8, 19, 3, 5);
+                    ctx.fillRect(20, 19, 3, 5);
+                }
+
+                ctx.fillStyle = '#2f1c09';
+                ctx.fillRect(4, 28, 8, 5);
+                ctx.fillRect(20, 28, 8, 5);
             }
 
-            ctx.fillStyle = '#2f1c09';
-            ctx.fillRect(4, 28, 8, 5);
-            ctx.fillRect(20, 28, 8, 5);
             ctx.restore();
         }
 
