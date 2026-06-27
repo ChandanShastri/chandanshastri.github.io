@@ -325,6 +325,9 @@
         let foodColor = '#ff4d7a';
         let boostActive = false;
         let boostUntil = 0;
+        let shrinkActive = false;
+        let shrinkUntil = 0;
+        let normalFoodStreak = 0;
 
         let currentPlayer = localStorage.getItem('snakeLastPlayer') || '';
         nameInput.value = currentPlayer;
@@ -426,6 +429,9 @@
             particles = [];
             boostActive = false;
             boostUntil = 0;
+            shrinkActive = false;
+            shrinkUntil = 0;
+            normalFoodStreak = 0;
             updateBoostStatus();
             placeFood();
             isGameRunning = true;
@@ -454,7 +460,24 @@
         function placeFood() {
             const palette = ['#ff4d7a', '#ffb347', '#8b5cf6', '#00d4ff'];
             foodColor = palette[Math.floor(Math.random() * palette.length)];
-            food.type = Math.random() < 0.3 ? 'boost' : 'normal';
+
+            const randomRoll = Math.random();
+            if (boostActive) {
+                food.type = 'normal';
+            } else if (normalFoodStreak >= 3) {
+                if (randomRoll < 0.35) {
+                    food.type = 'boost';
+                } else if (randomRoll < 0.55) {
+                    food.type = 'shrink';
+                } else {
+                    food.type = 'normal';
+                }
+                if (food.type !== 'normal') {
+                    normalFoodStreak = 0;
+                }
+            } else {
+                food.type = 'normal';
+            }
 
             let valid = false;
             while (!valid) {
@@ -468,6 +491,10 @@
                         break;
                     }
                 }
+            }
+
+            if (food.type === 'shrink') {
+                food.spawnedAt = performance.now();
             }
         }
 
@@ -499,6 +526,19 @@
                     boostActive = true;
                     boostUntil = performance.now() + 10000;
                     updateBoostStatus();
+                }
+
+                if (food.type === 'normal') {
+                    normalFoodStreak += 1;
+                } else {
+                    normalFoodStreak = 0;
+                }
+
+                if (food.type === 'shrink') {
+                    const targetLength = Math.max(3, Math.floor(snake.length / 2));
+                    snake = snake.slice(0, targetLength);
+                    shrinkActive = true;
+                    shrinkUntil = performance.now() + 3000;
                 }
 
                 GAME_SPEED = Math.max(55, 125 - Math.floor(score / 30) * 6);
@@ -539,14 +579,16 @@
             const cy = food.y * GRID_SIZE + GRID_SIZE / 2;
             const radius = GRID_SIZE / 2 - 3;
             const pulse = 0.9 + 0.12 * Math.sin(performance.now() / 220);
+            const isBoost = food.type === 'boost';
+            const isShrink = food.type === 'shrink';
             const grad = ctx.createRadialGradient(cx - 3, cy - 4, 2, cx, cy, radius + 4);
             grad.addColorStop(0, '#fff3d1');
-            grad.addColorStop(0.25, food.type === 'boost' ? '#fbbf24' : foodColor);
-            grad.addColorStop(1, food.type === 'boost' ? '#f59e0b' : '#ff235f');
+            grad.addColorStop(0.25, isBoost ? '#fbbf24' : isShrink ? '#4ade80' : foodColor);
+            grad.addColorStop(1, isBoost ? '#f59e0b' : isShrink ? '#16a34a' : '#ff235f');
 
             ctx.save();
-            if (food.type === 'boost') {
-                ctx.strokeStyle = '#fff59d';
+            if (isBoost || isShrink) {
+                ctx.strokeStyle = isBoost ? '#fff59d' : '#bef264';
                 ctx.lineWidth = 2.2;
                 ctx.globalAlpha = 0.9;
                 ctx.beginPath();
@@ -554,20 +596,28 @@
                 ctx.stroke();
             }
             ctx.shadowBlur = 22;
-            ctx.shadowColor = food.type === 'boost' ? '#f59e0b' : foodColor;
+            ctx.shadowColor = isBoost ? '#f59e0b' : isShrink ? '#4ade80' : foodColor;
             ctx.fillStyle = grad;
             ctx.beginPath();
             ctx.arc(cx, cy, radius * pulse, 0, Math.PI * 2);
             ctx.fill();
             ctx.restore();
 
-            if (food.type === 'boost') {
+            if (isBoost) {
                 ctx.save();
                 ctx.fillStyle = '#fff7ed';
                 ctx.font = 'bold 12px Segoe UI';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText('⚡', cx, cy + 1);
+                ctx.restore();
+            } else if (isShrink) {
+                ctx.save();
+                ctx.fillStyle = '#ecfdf5';
+                ctx.font = 'bold 12px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('↘', cx, cy + 1);
                 ctx.restore();
             }
         }
@@ -642,6 +692,11 @@
             if (boostActive && currentTime >= boostUntil) {
                 boostActive = false;
                 updateBoostStatus();
+            }
+
+            if (food.type === 'shrink' && food.spawnedAt && currentTime - food.spawnedAt >= 3000) {
+                food.type = 'normal';
+                food.spawnedAt = null;
             }
 
             updateBoostStatus();
