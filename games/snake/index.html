@@ -119,6 +119,26 @@
             text-align: center;
         }
 
+        #boost-status {
+            color: #fef3c7;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            transition: all 0.2s ease;
+            min-width: 100px;
+        }
+
+        #boost-status.boost-active {
+            background: linear-gradient(135deg, #fbbf24, #f97316);
+            color: #111827;
+            box-shadow: 0 0 18px rgba(251, 191, 36, 0.45);
+            animation: boostPulse 1s infinite;
+        }
+
+        @keyframes boostPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
         canvas {
             background-color: var(--grid-color);
             border-radius: 18px;
@@ -256,6 +276,7 @@
                 <div class="score-board">
                     <div class="score-item">Score: <span id="score">0</span></div>
                     <div class="score-item">Best: <span id="high-score">0</span></div>
+                    <div class="score-item" id="boost-status">Boost: Ready</div>
                 </div>
             </div>
         </header>
@@ -286,6 +307,7 @@
         const gameMsg = document.getElementById('game-msg');
         const nameInput = document.getElementById('player-name');
         const playerNameChip = document.getElementById('player-name-chip');
+        const boostStatusEl = document.getElementById('boost-status');
 
         const GRID_SIZE = 20;
         let TILE_COUNT_X = 20;
@@ -293,7 +315,7 @@
         let GAME_SPEED = 125;
 
         let snake = [];
-        let food = { x: 0, y: 0 };
+        let food = { x: 0, y: 0, type: 'normal' };
         let velocity = { x: 0, y: 0 };
         let nextVelocity = { x: 0, y: 0 };
         let score = 0;
@@ -301,10 +323,13 @@
         let lastTime = 0;
         let particles = [];
         let foodColor = '#ff4d7a';
+        let boostActive = false;
+        let boostUntil = 0;
 
         let currentPlayer = localStorage.getItem('snakeLastPlayer') || '';
         nameInput.value = currentPlayer;
         updateHighScoreDisplay();
+        updateBoostStatus();
 
         function getHighScore(name) {
             const safeName = name || 'Anonymous';
@@ -315,6 +340,19 @@
             const name = nameInput.value.trim() || 'Anonymous';
             highScoreEl.innerText = getHighScore(name);
             playerNameChip.innerText = `Player: ${name}`;
+        }
+
+        function updateBoostStatus() {
+            if (boostActive) {
+                const secondsLeft = Math.max(0, Math.ceil((boostUntil - performance.now()) / 1000));
+                boostStatusEl.innerText = `⚡ Boost ${secondsLeft}s`;
+                boostStatusEl.classList.add('boost-active');
+                boostStatusEl.style.color = '#111827';
+            } else {
+                boostStatusEl.innerText = '⚡ Boost Ready';
+                boostStatusEl.classList.remove('boost-active');
+                boostStatusEl.style.color = '#fef3c7';
+            }
         }
 
         nameInput.addEventListener('input', () => {
@@ -386,6 +424,9 @@
             GAME_SPEED = 125;
             scoreEl.innerText = score;
             particles = [];
+            boostActive = false;
+            boostUntil = 0;
+            updateBoostStatus();
             placeFood();
             isGameRunning = true;
             uiLayer.classList.add('hidden');
@@ -413,6 +454,7 @@
         function placeFood() {
             const palette = ['#ff4d7a', '#ffb347', '#8b5cf6', '#00d4ff'];
             foodColor = palette[Math.floor(Math.random() * palette.length)];
+            food.type = Math.random() < 0.3 ? 'boost' : 'normal';
 
             let valid = false;
             while (!valid) {
@@ -452,6 +494,13 @@
                 const burstX = food.x * GRID_SIZE + GRID_SIZE / 2;
                 const burstY = food.y * GRID_SIZE + GRID_SIZE / 2;
                 addParticleBurst(burstX, burstY, foodColor);
+
+                if (food.type === 'boost') {
+                    boostActive = true;
+                    boostUntil = performance.now() + 10000;
+                    updateBoostStatus();
+                }
+
                 GAME_SPEED = Math.max(55, 125 - Math.floor(score / 30) * 6);
                 placeFood();
             } else {
@@ -492,17 +541,35 @@
             const pulse = 0.9 + 0.12 * Math.sin(performance.now() / 220);
             const grad = ctx.createRadialGradient(cx - 3, cy - 4, 2, cx, cy, radius + 4);
             grad.addColorStop(0, '#fff3d1');
-            grad.addColorStop(0.25, foodColor);
-            grad.addColorStop(1, '#ff235f');
+            grad.addColorStop(0.25, food.type === 'boost' ? '#fbbf24' : foodColor);
+            grad.addColorStop(1, food.type === 'boost' ? '#f59e0b' : '#ff235f');
 
             ctx.save();
-            ctx.shadowBlur = 18;
-            ctx.shadowColor = foodColor;
+            if (food.type === 'boost') {
+                ctx.strokeStyle = '#fff59d';
+                ctx.lineWidth = 2.2;
+                ctx.globalAlpha = 0.9;
+                ctx.beginPath();
+                ctx.arc(cx, cy, radius + 4 + Math.sin(performance.now() / 140) * 1.6, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            ctx.shadowBlur = 22;
+            ctx.shadowColor = food.type === 'boost' ? '#f59e0b' : foodColor;
             ctx.fillStyle = grad;
             ctx.beginPath();
             ctx.arc(cx, cy, radius * pulse, 0, Math.PI * 2);
             ctx.fill();
             ctx.restore();
+
+            if (food.type === 'boost') {
+                ctx.save();
+                ctx.fillStyle = '#fff7ed';
+                ctx.font = 'bold 12px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('⚡', cx, cy + 1);
+                ctx.restore();
+            }
         }
 
         function drawSnake() {
@@ -535,8 +602,23 @@
             });
         }
 
+        function drawBoostOverlay() {
+            if (!boostActive) return;
+
+            const secondsLeft = Math.max(0, Math.ceil((boostUntil - performance.now()) / 1000));
+            ctx.save();
+            ctx.fillStyle = 'rgba(251, 191, 36, 0.16)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#fde68a';
+            ctx.font = 'bold 16px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillText(`BOOST ACTIVE • ${secondsLeft}s`, canvas.width / 2, 24);
+            ctx.restore();
+        }
+
         function draw() {
             drawBoard();
+            drawBoostOverlay();
             drawParticles();
             drawFood();
             drawSnake();
@@ -557,9 +639,17 @@
         function gameLoop(currentTime) {
             if (!isGameRunning) return;
 
-            const deltaTime = currentTime - lastTime;
+            if (boostActive && currentTime >= boostUntil) {
+                boostActive = false;
+                updateBoostStatus();
+            }
 
-            if (deltaTime >= GAME_SPEED) {
+            updateBoostStatus();
+
+            const deltaTime = currentTime - lastTime;
+            const activeSpeed = boostActive ? Math.max(45, GAME_SPEED - 70) : GAME_SPEED;
+
+            if (deltaTime >= activeSpeed) {
                 update();
                 lastTime = currentTime;
             }
